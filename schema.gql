@@ -1,0 +1,72 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type RespondentDetails {
+  ideology: String!
+  compassPoint: [Float!]!
+}
+
+type Survey {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  answers: [Int!]!
+  finished: Boolean!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Respondent {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  code: [String!]!
+  details: RespondentDetails
+  surveys: [Survey]!
+}
+
+type Query {
+  respondent(code: [String!]!): Respondent!
+  meRespondent: Respondent!
+  survey(id: String!): Survey!
+}
+
+type Mutation {
+  createRespondent(createRespondentInput: CreateRespondentInput!): Respondent!
+  updateRespondent(updateRespondentInput: UpdateRespondentInput!): Respondent!
+  removeRespondent(id: String!): Respondent!
+  createSurvey(createSurveyInput: CreateSurveyInput!): Survey!
+  updateSurvey(updateSurveyInput: UpdateSurveyInput!): Survey!
+}
+
+input CreateRespondentInput {
+  lang: Language!
+}
+
+enum Language {
+  POLISH
+  ENGLISH
+}
+
+input UpdateRespondentInput {
+  details: RespondentDetailsInput!
+}
+
+input RespondentDetailsInput {
+  ideology: String!
+  compassPoint: [Float!]!
+}
+
+input CreateSurveyInput {
+  quizId: String!
+}
+
+input UpdateSurveyInput {
+  id: String!
+  answers: [Int]!
+  finished: Boolean
+}
