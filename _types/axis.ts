@@ -2,11 +2,11 @@ import { TextTranslation } from './common';
 
 export interface Axis {
   name?: string;
-  left: AxisIdeology;
-  right: AxisIdeology;
+  left: Ideology;
+  right: Ideology;
 }
 
-export interface AxisIdeology {
+export interface Ideology {
   name: TextTranslation;
   description: TextTranslation;
   color: string;

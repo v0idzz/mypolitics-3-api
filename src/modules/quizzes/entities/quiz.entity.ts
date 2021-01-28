@@ -3,7 +3,8 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { BaseEntity } from '../../../shared/base/base.entity';
 import { TextTranslation } from '../../../shared/entities/text-translation.entity';
-import { QuizVersion } from './quiz-version.entity';
+import { QuizVersion } from '../../quiz-versions/entities/quiz-version.entity';
+import * as mongoose from 'mongoose';
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -20,7 +21,7 @@ export class Quiz extends BaseEntity {
   @Field(() => TextTranslation)
   description: TextTranslation;
 
-  @Prop({ type: Types.ObjectId, ref: 'QuizVersion' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'QuizVersion' })
   @Field(() => QuizVersion)
   currentVersion: QuizVersion;
 

@@ -6,14 +6,16 @@ import { Survey, SurveySchema } from './entities/survey.entity';
 import { RespondentsModule } from '../respondents/respondents.module';
 import { RespondentsService } from '../respondents/respondents.service';
 import { Respondent, RespondentSchema } from '../respondents/entities/respondent.entity';
+import { SurveyAnswer, SurveyAnswerSchema } from './entities/survey-answer.entity';
 
 @Module({
   imports: [
+    RespondentsModule,
     MongooseModule.forFeature([
       { name: Survey.name, schema: SurveySchema },
-      { name: Respondent.name, schema: RespondentSchema }
+      { name: Respondent.name, schema: RespondentSchema },
+      { name: SurveyAnswer.name, schema: SurveyAnswerSchema }
     ]),
-    RespondentsModule,
   ],
   providers: [SurveysResolver, SurveysService, Logger, RespondentsService]
 })

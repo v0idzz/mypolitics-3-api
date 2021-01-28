@@ -3,6 +3,7 @@ export const enum ErrorCode {
   NOT_AUTHORIZED,
   RESPONDENT_HEADER_NOT_PROVIDED,
   SURVEY_FINISHED,
+  SURVEY_NOT_FINISHED,
 }
 
 export interface ErrorMessage {

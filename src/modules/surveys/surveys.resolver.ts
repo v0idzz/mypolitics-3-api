@@ -1,16 +1,18 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { SurveysService } from './surveys.service';
 import { Survey } from './entities/survey.entity';
 import { CreateSurveyInput } from './dto/create-survey.input';
 import { UpdateSurveyInput } from './dto/update-survey.input';
-import { getRespondentFromHeader } from '../../shared/utils/get-respondent-from-header';
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { RespondentsService } from '../respondents/respondents.service';
+import { RespondentGuard } from '../../shared/guards/respondent.guard';
+import { CurrentRespondent } from '../../shared/decorators/current-respondent.decorator';
+import { Respondent } from '../respondents/entities/respondent.entity';
 
 @Resolver(() => Survey)
+@UseGuards(RespondentGuard)
 export class SurveysResolver {
   constructor(
     private readonly surveysService: SurveysService,
@@ -20,16 +22,10 @@ export class SurveysResolver {
   @Mutation(() => Survey)
   async createSurvey(
     @Args('createSurveyInput') createSurveyInput: CreateSurveyInput,
-    @Context() context: ExpressContext,
+    @CurrentRespondent() respondent: Respondent
   ) {
-    const respondent = getRespondentFromHeader(context);
-    if (!respondent) {
-      throw new UnauthorizedException(
-        ErrorsMessages[ErrorCode.RESPONDENT_HEADER_NOT_PROVIDED],
-      );
-    }
-
     const survey = await this.surveysService.createOne({
+      ...createSurveyInput,
       finished: false,
       answers: [],
     });
@@ -42,38 +38,21 @@ export class SurveysResolver {
   }
 
   @Query(() => Survey, { name: 'survey' })
-  findOne(
-    @Args('id', { type: () => String }) _id: string,
-    @Context() context: ExpressContext,
-  ) {
-    const respondent = getRespondentFromHeader(context);
-    if (!respondent) {
-      throw new UnauthorizedException(
-        ErrorsMessages[ErrorCode.RESPONDENT_HEADER_NOT_PROVIDED],
-      );
-    }
-
-    return this.surveysService.findOne({
-      _id,
-    });
+  findOne(@Args('id') _id: string) {
+    return this.surveysService.findOne({ _id });
   }
 
   @Mutation(() => Survey)
   async updateSurvey(
-    @Args('updateSurveyInput') { id, ...updateSurveyInput }: UpdateSurveyInput,
-    @Context() context: ExpressContext,
+    @Args({ name: 'id', type: () => String }) _id: string,
+    @Args('updateSurveyInput') updateSurveyInput: UpdateSurveyInput,
+    @CurrentRespondent() respondent: Respondent
   ) {
-    const respondent = getRespondentFromHeader(context);
-    if (!respondent) {
-      throw new UnauthorizedException(
-        ErrorsMessages[ErrorCode.RESPONDENT_HEADER_NOT_PROVIDED],
-      );
-    }
-
     const hasPermission = await this.respondentsService.findOneOrNull({
       _id: { $eq: respondent._id },
-      surveys: { $all: [id] },
+      surveys: { $all: [_id] },
     });
+
     if (!hasPermission) {
       throw new UnauthorizedException(
         ErrorsMessages[ErrorCode.NOT_AUTHORIZED],
@@ -82,8 +61,9 @@ export class SurveysResolver {
 
     const survey = await this.surveysService.updateOne({
       finished: false,
-      _id: id
+      _id,
     }, updateSurveyInput);
+
     if (!survey) {
       throw new BadRequestException(ErrorsMessages[ErrorCode.SURVEY_FINISHED]);
     }

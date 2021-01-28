@@ -1,19 +1,19 @@
 import { TextTranslation } from './common';
-import { AxisIdeology } from './axis';
+import { Ideology } from './axis';
 
 export interface CompassMode {
   name: TextTranslation;
   horizontal: CompassAxis;
   vertical: CompassAxis;
-  third: CompassAxis;
+  third?: CompassAxis;
 }
 
 interface CompassAxis {
-  ideologies: CompassAxisIdeology[];
+  ideologies: CompassIdeology[];
   name: TextTranslation;
 }
 
-interface CompassAxisIdeology {
-  ideology: AxisIdeology;
+interface CompassIdeology {
+  ideology: Ideology;
   weight: number;
 }

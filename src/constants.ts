@@ -16,13 +16,18 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
   [ErrorCode.SURVEY_FINISHED]: {
     code: ErrorCode.SURVEY_FINISHED,
     text: 'Survey has been finished',
+  },
+  [ErrorCode.SURVEY_NOT_FINISHED]: {
+    code: ErrorCode.SURVEY_NOT_FINISHED,
+    text: 'Survey has not been finished yet',
   }
 };
 
 export const Cookies = {};
 
 export const Headers = {
-  RESPONDENT: 'mypolitics-respondent'
+  RESPONDENT: 'mypolitics-respondent',
+  ADMIN: 'mypolitics-admin'
 };
 
 export const PubSubIterators = {};

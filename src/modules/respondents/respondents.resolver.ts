@@ -1,14 +1,12 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { RespondentsService } from './respondents.service';
 import { Respondent } from './entities/respondent.entity';
 import { CreateRespondentInput } from './dto/create-respondent.input';
 import { UpdateRespondentInput } from './dto/update-respondent.input';
 import { codesSets, getRandomCode } from './utils/codes-sets';
-import { ErrorsMessages, Headers } from '../../constants';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { UnauthorizedException } from '@nestjs/common';
-import { ErrorCode } from '../../types';
-import { getRespondentFromHeader } from '../../shared/utils/get-respondent-from-header';
+import { UseGuards } from '@nestjs/common';
+import { RespondentGuard } from '../../shared/guards/respondent.guard';
+import { CurrentRespondent } from '../../shared/decorators/current-respondent.decorator';
 
 @Resolver(() => Respondent)
 export class RespondentsResolver {
@@ -36,36 +34,27 @@ export class RespondentsResolver {
   }
 
   @Query(() => Respondent, { name: 'meRespondent' })
-  me(
-    @Context() context: ExpressContext,
-  ): Promise<Respondent> {
-    const respondent = getRespondentFromHeader(context);
-    if (!respondent) {
-      throw new UnauthorizedException(
-        ErrorsMessages[ErrorCode.RESPONDENT_HEADER_NOT_PROVIDED],
-      );
-    }
-
-    return this.respondentsService.findOne(respondent, {}, { populate: 'surveys' });
+  @UseGuards(RespondentGuard)
+  me(@CurrentRespondent() respondent): Promise<Respondent> {
+    return this.respondentsService.findOne(
+      respondent,
+      {},
+      { populate: 'surveys' },
+    );
   }
 
   @Mutation(() => Respondent)
+  @UseGuards(RespondentGuard)
   async updateRespondent(
     @Args('updateRespondentInput') { details }: UpdateRespondentInput,
-    @Context() context: ExpressContext,
+    @CurrentRespondent() respondent
   ): Promise<Respondent> {
-    const respondent = getRespondentFromHeader(context);
-    if (!respondent) {
-      throw new UnauthorizedException(
-        ErrorsMessages[ErrorCode.RESPONDENT_HEADER_NOT_PROVIDED],
-      );
-    }
-
     return this.respondentsService.updateOne(respondent, { details });
   }
 
   @Mutation(() => Respondent)
-  removeRespondent(@Args('id', { type: () => String }) _id: string) {
-    return this.respondentsService.deleteOne({ _id });
+  @UseGuards(RespondentGuard)
+  removeMe(@CurrentRespondent() respondent: Respondent) {
+    return this.respondentsService.deleteOne(respondent);
   }
 }

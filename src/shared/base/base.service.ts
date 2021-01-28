@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { Document, DocumentDefinition, FilterQuery, Model, PopulateOptions, QueryOptions, UpdateQuery } from 'mongoose';
+import { Document, DocumentDefinition, FilterQuery, Model, QueryOptions } from 'mongoose';
 
 @Injectable()
 export abstract class BaseService<T extends Document> {
@@ -53,7 +53,7 @@ export abstract class BaseService<T extends Document> {
   async updateOne(
     conditions: FilterQuery<T>,
     update?: any,
-    options?: QueryOptions | null
+    options: Record<string, unknown> = {}
   ): Promise<T> {
     try {
       const defaultOptions = {

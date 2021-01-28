@@ -15,5 +15,6 @@ interface QuizVersion {
   publishedOn?: Date;
   axes: Axis[];
   questions: Question[];
-  compass?: CompassMode;
+  compassModes?: CompassMode[];
+  parent?: QuizVersion;
 }

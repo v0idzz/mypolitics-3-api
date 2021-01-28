@@ -1,5 +1,5 @@
 import { TextTranslation } from './common';
-import { AxisIdeology } from './axis';
+import { Ideology } from './axis';
 import { Party } from './party';
 
 export interface Question {
@@ -11,6 +11,6 @@ export interface Question {
 }
 
 interface QuestionEffect {
-  axes: AxisIdeology[];
+  axes: Ideology[];
   parties: Party[];
 }
