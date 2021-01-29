@@ -1,11 +1,12 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { QuizzesService } from './quizzes.service';
-import { Quiz } from './entities/quiz.entity';
+import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { CreateQuizInput } from './dto/create-quiz.input';
 import { UpdateQuizInput } from './dto/update-quiz.input';
 import { UseGuards } from '@nestjs/common';
 import { RespondentGuard } from '../../shared/guards/respondent.guard';
 import { AdminGuard } from '../../shared/guards/admin.guard';
+import { QuizMeta } from './entities/quiz-meta.entity';
 
 @Resolver(() => Quiz)
 @UseGuards(RespondentGuard)
@@ -22,7 +23,7 @@ export class QuizzesResolver {
     return this.quizzesService.createOne({
       ...createQuizInput,
       currentVersion: null,
-      versions: []
+      versions: [],
     });
   }
 
@@ -43,6 +44,11 @@ export class QuizzesResolver {
     });
   }
 
+  @Query(() => [Quiz], { name: 'featuredQuizzes' })
+  async findFeatured(): Promise<Quiz[]> {
+    return this.quizzesService.getFeaturedQuizzes();
+  }
+
   @Mutation(() => Quiz)
   @UseGuards(AdminGuard)
   async updateQuiz(
@@ -50,5 +56,22 @@ export class QuizzesResolver {
     @Args('updateQuizInput') updateQuizInput: UpdateQuizInput,
   ): Promise<Quiz> {
     return this.quizzesService.updateOne({ _id }, updateQuizInput);
+  }
+
+  @ResolveField()
+  async meta(@Parent() quiz: QuizDocument): Promise<QuizMeta> {
+    await quiz.populate('versions currentVersion').execPopulate();
+
+    const features = {
+      ...quiz.meta.features,
+      compass: quiz.currentVersion.compassModes.length > 0,
+      axesNumber: quiz.currentVersion.axes.length,
+      questionsNumber: quiz.currentVersion.questions.length,
+    };
+
+    return {
+      ...quiz.meta,
+      features,
+    };
   }
 }

@@ -38,6 +38,24 @@ export abstract class BaseService<T extends Document> {
     }
   }
 
+  async findMany(
+    conditions: FilterQuery<T>,
+    projection: string | Record<string, unknown> = {},
+    options: Record<string, unknown> = {},
+  ): Promise<T[]> {
+    try {
+      return await this.model.find(
+        conditions as FilterQuery<T>,
+        projection,
+        options,
+      );
+    } catch (err) {
+      this.serviceLogger.error(`Could not find ${this.modelName} entries:`);
+      this.serviceLogger.error(err);
+      throw new InternalServerErrorException();
+    }
+  }
+
   async findOneOrNull(
     conditions: Partial<Record<keyof T, unknown>>,
     projection: string | Record<string, unknown> = {},

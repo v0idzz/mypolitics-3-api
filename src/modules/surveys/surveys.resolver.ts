@@ -10,6 +10,7 @@ import { RespondentsService } from '../respondents/respondents.service';
 import { RespondentGuard } from '../../shared/guards/respondent.guard';
 import { CurrentRespondent } from '../../shared/decorators/current-respondent.decorator';
 import { Respondent } from '../respondents/entities/respondent.entity';
+import { QuizzesService } from '../quizzes/quizzes.service';
 
 @Resolver(() => Survey)
 @UseGuards(RespondentGuard)
@@ -17,6 +18,7 @@ export class SurveysResolver {
   constructor(
     private readonly surveysService: SurveysService,
     private readonly respondentsService: RespondentsService,
+    private readonly quizzesService: QuizzesService,
   ) {}
 
   @Mutation(() => Survey)
@@ -30,9 +32,15 @@ export class SurveysResolver {
       answers: [],
     });
 
-    await this.respondentsService.updateOne(respondent, {
-      $push: { surveys: survey },
-    });
+    await Promise.all([
+      await this.respondentsService.updateOne(respondent, {
+        $push: { surveys: survey },
+      }),
+      await this.quizzesService.updateOne(
+        { versions: { $in: [createSurveyInput.quizVersion] }},
+        { $inc: { 'meta.statistics.surveysNumber': 1 } }
+      ),
+    ]);
 
     return survey;
   }

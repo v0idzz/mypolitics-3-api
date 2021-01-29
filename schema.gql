@@ -143,13 +143,43 @@ type Respondent {
   surveys: [Survey]!
 }
 
+type QuizFeatures {
+  compass: Boolean!
+  axesNumber: Int!
+  questionsNumber: Int!
+  authorizedParties: [Party]!
+}
+
+type QuizStatistics {
+  surveysNumber: Int!
+}
+
+type QuizAuthor {
+  name: String!
+  url: String!
+}
+
+type QuizMeta {
+  features: QuizFeatures!
+  statistics: QuizStatistics!
+  author: QuizAuthor!
+  license: QuizLicense!
+}
+
+enum QuizLicense {
+  COMMERCIAL
+  MIT
+}
+
 type Quiz {
   id: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   slug: String!
+  logoUrl: String!
   title: TextTranslation!
   description: TextTranslation!
+  meta: QuizMeta!
   currentVersion: QuizVersion!
   versions: [QuizVersion]!
 }
@@ -200,6 +230,7 @@ type Query {
   meRespondent: Respondent!
   survey(id: String!): Survey!
   quiz(slug: String!): Quiz!
+  featuredQuizzes: [Quiz!]!
   quizVersion(id: String!): QuizVersion!
   results(surveyId: String!): Results!
 }
@@ -258,8 +289,10 @@ input SurveyAnswerInput {
 
 input CreateQuizInput {
   slug: String!
+  logoUrl: String!
   title: TextTranslationInput!
   description: TextTranslationInput!
+  meta: QuizMetaInput!
 }
 
 input TextTranslationInput {
@@ -267,10 +300,32 @@ input TextTranslationInput {
   en: String
 }
 
+input QuizMetaInput {
+  features: QuizFeaturesInput!
+  statistics: QuizStatisticsInput!
+  author: QuizAuthorInput!
+  license: QuizLicense!
+}
+
+input QuizFeaturesInput {
+  authorizedParties: [String!]!
+}
+
+input QuizStatisticsInput {
+  surveysNumber: Int!
+}
+
+input QuizAuthorInput {
+  name: String!
+  url: String!
+}
+
 input UpdateQuizInput {
   title: TextTranslationInput
+  logoUrl: String!
   description: TextTranslationInput
   currentVersion: String
+  meta: QuizMetaInput!
 }
 
 input CreateIdeologyInput {
