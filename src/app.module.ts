@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLGatewayModule, GraphQLFederationModule, GATEWAY_BUILD_SERVICE } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,9 +19,14 @@ import { PartiesModule } from './modules/parties/parties.module';
 import { QuestionsModule } from './modules/questions/questions.module';
 import { ResultsModule } from './modules/results/results.module';
 import { BuildServiceModule } from './modules/build-service/build-service.module';
+import { RespondentsService } from './modules/respondents/respondents.service';
+import { Respondent, RespondentSchema } from './modules/respondents/entities/respondent.entity';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      { name: Respondent.name, schema: RespondentSchema },
+    ]),
     GraphQLFederationModule.forRootAsync({
       imports: [ConfigModule.forFeature(graphqlConfig)],
       useFactory: async (configService: ConfigService) => (
@@ -59,12 +64,11 @@ import { BuildServiceModule } from './modules/build-service/build-service.module
     ResultsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [RespondentsService, Logger],
   exports: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(IsAdminMiddleware).forRoutes('*');
-    consumer.apply(RespondentMiddleware).forRoutes('*');
+    consumer.apply(IsAdminMiddleware, RespondentMiddleware).forRoutes('*');
   }
 }

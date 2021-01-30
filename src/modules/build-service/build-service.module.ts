@@ -2,10 +2,9 @@ import { RemoteGraphQLDataSource } from '@apollo/gateway';
 import { GATEWAY_BUILD_SERVICE } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { Headers } from '../../constants';
-import { GraphQLRequestContext } from 'apollo-server-types';
 
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
-  willSendRequest({ request, context }: GraphQLRequestContext) {
+  willSendRequest({ request, context }) {
     if (!context.req) {
       return;
     }
@@ -14,14 +13,13 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
       names.forEach((name) => {
         const value = context.req.headers[name];
 
-
         if (value) {
           request.http.headers.set(name, value);
         }
       })
     );
 
-    setHeaders([Headers.ADMIN, Headers.RESPONDENT]);
+    setHeaders([Headers.ADMIN, Headers.RESPONDENT, 'accept-language']);
   }
 }
 

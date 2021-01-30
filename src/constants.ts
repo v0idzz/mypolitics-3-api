@@ -23,7 +23,9 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
   }
 };
 
-export const Cookies = {};
+export const Cookies = {
+  RESPONDENT: 'mypolitics-respondent',
+};
 
 export const Headers = {
   RESPONDENT: 'mypolitics-respondent',

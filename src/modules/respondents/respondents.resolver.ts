@@ -1,12 +1,14 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { RespondentsService } from './respondents.service';
 import { Respondent } from './entities/respondent.entity';
 import { CreateRespondentInput } from './dto/create-respondent.input';
 import { UpdateRespondentInput } from './dto/update-respondent.input';
-import { codesSets, getRandomCode } from './utils/codes-sets';
 import { UseGuards } from '@nestjs/common';
 import { RespondentGuard } from '../../shared/guards/respondent.guard';
 import { CurrentRespondent } from '../../shared/decorators/current-respondent.decorator';
+import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
+import Cookies from 'cookies';
+import { Cookies as ConstCookies } from '../../constants';
 
 @Resolver(() => Respondent)
 export class RespondentsResolver {
@@ -14,15 +16,7 @@ export class RespondentsResolver {
 
   @Mutation(() => Respondent)
   async createRespondent(@Args('createRespondentInput') { lang }: CreateRespondentInput) {
-    const set = codesSets[lang];
-    let code: string[];
-    let respondentFound: Respondent | null;
-
-    do {
-      code = getRandomCode(set);
-      respondentFound = await this.respondentsService.findOneOrNull({ code });
-    } while (respondentFound !== null);
-
+    const code = await this.respondentsService.generateCode(lang);
     return this.respondentsService.createOne({ code, surveys: [] });
   }
 
@@ -50,6 +44,19 @@ export class RespondentsResolver {
     @CurrentRespondent() respondent
   ): Promise<Respondent> {
     return this.respondentsService.updateOne(respondent, { details });
+  }
+
+  @Mutation(() => Respondent)
+  async changeCode(
+    @Args({ name: 'code', type: () => [String] }) code: string[],
+    @Context() { req, res }: ExpressContext
+  ): Promise<Respondent> {
+    const cookies = new Cookies(req, res);
+    const respondent = await this.respondentsService.findOne({ code });
+    const { _id } = respondent;
+    const respondentData = Buffer.from(JSON.stringify({ _id })).toString('base64');
+    cookies.set(ConstCookies.RESPONDENT, respondentData);
+    return respondent;
   }
 
   @Mutation(() => Respondent)

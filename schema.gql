@@ -238,6 +238,7 @@ type Query {
 type Mutation {
   createRespondent(createRespondentInput: CreateRespondentInput!): Respondent!
   updateRespondent(updateRespondentInput: UpdateRespondentInput!): Respondent!
+  changeCode(code: [String!]!): Respondent!
   removeMe: Respondent!
   createSurvey(createSurveyInput: CreateSurveyInput!): Survey!
   updateSurvey(updateSurveyInput: UpdateSurveyInput!, id: String!): Survey!
