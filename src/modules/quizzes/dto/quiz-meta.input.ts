@@ -6,6 +6,12 @@ import { QuizLicense } from '../enums/quiz-license.enum';
 class QuizFeaturesInput {
   @Field(() => [String])
   authorizedParties: Party[];
+
+  @Field(() => Boolean)
+  parties: boolean;
+
+  @Field(() => Boolean)
+  politiciansResults: boolean;
 }
 
 @InputType()

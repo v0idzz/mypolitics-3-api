@@ -8,7 +8,7 @@ export class UpdateQuizInput {
   @Field(() => TextTranslationInput, { nullable: true })
   title?: TextTranslationInput;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   logoUrl?: string;
 
   @Field(() => TextTranslationInput, { nullable: true })
@@ -17,6 +17,6 @@ export class UpdateQuizInput {
   @Field(() => String, { nullable: true })
   currentVersion?: QuizVersion;
 
-  @Field(() => QuizMetaInput)
+  @Field(() => QuizMetaInput, { nullable: true })
   meta?: QuizMetaInput;
 }

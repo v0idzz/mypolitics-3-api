@@ -1,4 +1,4 @@
-import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLGatewayModule, GraphQLFederationModule, GATEWAY_BUILD_SERVICE } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -69,6 +69,9 @@ import { Respondent, RespondentSchema } from './modules/respondents/entities/res
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(IsAdminMiddleware, RespondentMiddleware).forRoutes('*');
+    consumer.apply(RespondentMiddleware, IsAdminMiddleware).forRoutes({
+      path: '/graphql',
+      method: RequestMethod.ALL
+    });
   }
 }

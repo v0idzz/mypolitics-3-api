@@ -108,6 +108,7 @@ type QuizVersion {
   parent: QuizVersion
   questions: [Question]!
   compassModes: [QuizCompassMode]!
+  quiz: Quiz!
 }
 
 type SurveyAnswer {
@@ -147,6 +148,8 @@ type QuizFeatures {
   compass: Boolean!
   axesNumber: Int!
   questionsNumber: Int!
+  parties: Boolean!
+  politiciansResults: Boolean!
   authorizedParties: [Party]!
 }
 
@@ -310,6 +313,8 @@ input QuizMetaInput {
 
 input QuizFeaturesInput {
   authorizedParties: [String!]!
+  parties: Boolean!
+  politiciansResults: Boolean!
 }
 
 input QuizStatisticsInput {
@@ -323,10 +328,10 @@ input QuizAuthorInput {
 
 input UpdateQuizInput {
   title: TextTranslationInput
-  logoUrl: String!
+  logoUrl: String
   description: TextTranslationInput
   currentVersion: String
-  meta: QuizMetaInput!
+  meta: QuizMetaInput
 }
 
 input CreateIdeologyInput {

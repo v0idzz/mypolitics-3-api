@@ -9,7 +9,6 @@ import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizMeta } from './entities/quiz-meta.entity';
 
 @Resolver(() => Quiz)
-@UseGuards(RespondentGuard)
 export class QuizzesResolver {
   constructor(
     private readonly quizzesService: QuizzesService,

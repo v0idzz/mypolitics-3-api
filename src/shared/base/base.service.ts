@@ -21,13 +21,13 @@ export abstract class BaseService<T extends Document> {
   }
 
   async findOne(
-    conditions: Partial<Record<keyof T, unknown>>,
+    conditions: FilterQuery<T>,
     projection: string | Record<string, unknown> = {},
     options: Record<string, unknown> = {},
   ): Promise<T> {
     try {
       return await this.model.findOne(
-        conditions as FilterQuery<T>,
+        conditions,
         projection,
         options,
       );
@@ -57,7 +57,7 @@ export abstract class BaseService<T extends Document> {
   }
 
   async findOneOrNull(
-    conditions: Partial<Record<keyof T, unknown>>,
+    conditions: FilterQuery<T>,
     projection: string | Record<string, unknown> = {},
     options: Record<string, unknown> = {},
   ): Promise<T | null> {

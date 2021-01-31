@@ -9,6 +9,7 @@ import { CurrentRespondent } from '../../shared/decorators/current-respondent.de
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import Cookies from 'cookies';
 import { Cookies as ConstCookies } from '../../constants';
+import dayjs from 'dayjs';
 
 @Resolver(() => Respondent)
 export class RespondentsResolver {
@@ -55,7 +56,9 @@ export class RespondentsResolver {
     const respondent = await this.respondentsService.findOne({ code });
     const { _id } = respondent;
     const respondentData = Buffer.from(JSON.stringify({ _id })).toString('base64');
-    cookies.set(ConstCookies.RESPONDENT, respondentData);
+    cookies.set(ConstCookies.RESPONDENT, respondentData, {
+      expires: dayjs().add(3, 'month').toDate(),
+    });
     return respondent;
   }
 

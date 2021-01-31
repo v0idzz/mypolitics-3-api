@@ -1,15 +1,14 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { QuizVersionsService } from './quiz-versions.service';
 import { UseGuards } from '@nestjs/common';
-import { RespondentGuard } from '../../shared/guards/respondent.guard';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizVersion } from './entities/quiz-version.entity';
 import { UpdateQuizVersionInput } from './dto/update-quiz-version.input';
 import { CreateQuizVersionInput } from './dto/create-quiz-version.input';
 import { QuizzesService } from '../quizzes/quizzes.service';
+import { Quiz } from '../quizzes/entities/quiz.entity';
 
 @Resolver(() => QuizVersion)
-@UseGuards(RespondentGuard)
 export class QuizVersionsResolver {
   constructor(
     private readonly quizVersionsService: QuizVersionsService,
@@ -53,5 +52,10 @@ export class QuizVersionsResolver {
     @Args('updateQuizVersionInput') updateQuizVersionInput: UpdateQuizVersionInput,
   ): Promise<QuizVersion> {
     return this.quizVersionsService.updateOne({ _id }, updateQuizVersionInput);
+  }
+
+  @ResolveField(() => Quiz)
+  async quiz(@Parent() quizVersion: QuizVersion): Promise<Quiz> {
+    return this.quizzesService.findOne({ versions: { $in: [quizVersion] } });
   }
 }

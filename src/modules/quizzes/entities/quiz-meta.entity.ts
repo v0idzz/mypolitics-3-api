@@ -16,6 +16,14 @@ class QuizFeatures {
   @Field(() => Int)
   questionsNumber?: number;
 
+  @Prop(Boolean)
+  @Field(() => Boolean)
+  parties: boolean;
+
+  @Prop(Boolean)
+  @Field(() => Boolean)
+  politiciansResults: boolean;
+
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Party' }] })
   @Field(() => [Party], { nullable: 'items' })
   authorizedParties: Party[];

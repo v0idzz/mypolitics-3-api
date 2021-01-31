@@ -9,6 +9,11 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
       return;
     }
 
+    if (context.req.respondent) {
+      const respondentData = Buffer.from(JSON.stringify(context.req.respondent)).toString('base64');
+      request.http.headers.set(Headers.RESPONDENT, respondentData);
+    }
+
     const setHeaders = (names: string[]) => (
       names.forEach((name) => {
         const value = context.req.headers[name];
@@ -19,7 +24,7 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
       })
     );
 
-    setHeaders([Headers.ADMIN, Headers.RESPONDENT, 'accept-language']);
+    setHeaders([Headers.ADMIN, Headers.RESPONDENT]);
   }
 }
 
