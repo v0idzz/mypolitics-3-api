@@ -47,7 +47,14 @@ export class SurveysResolver {
 
   @Query(() => Survey, { name: 'survey' })
   findOne(@Args('id') _id: string) {
-    return this.surveysService.findOne({ _id });
+    return this.surveysService.findOne({ _id }, {}, {
+      populate: {
+        path: 'quizVersion',
+        populate: {
+          path: 'questions'
+        }
+      }
+    });
   }
 
   @Mutation(() => Survey)
@@ -70,7 +77,16 @@ export class SurveysResolver {
     const survey = await this.surveysService.updateOne({
       finished: false,
       _id,
-    }, updateSurveyInput);
+    },
+    updateSurveyInput,
+    {
+      populate: {
+        path: 'quizVersion',
+        populate: {
+          path: 'questions'
+        }
+      }
+    });
 
     if (!survey) {
       throw new BadRequestException(ErrorsMessages[ErrorCode.SURVEY_FINISHED]);

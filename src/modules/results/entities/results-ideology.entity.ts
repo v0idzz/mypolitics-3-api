@@ -5,4 +5,7 @@ import { Ideology } from '../../ideologies/entities/ideology.entity';
 export class ResultsIdeology extends Ideology {
   @Field(() => Int)
   points: number;
+
+  @Field(() => Int)
+  maxPoints: number;
 }

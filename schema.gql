@@ -195,6 +195,7 @@ type ResultsParty {
   logoUrl: String!
   country: Country!
   points: Int!
+  maxPoints: Int!
 }
 
 type ResultsIdeology {
@@ -206,12 +207,14 @@ type ResultsIdeology {
   color: String!
   icon: IdeologyIcon!
   points: Int!
+  maxPoints: Int!
 }
 
 type ResultsAxis {
   name: TextTranslation
   left: ResultsIdeology!
   right: ResultsIdeology!
+  maxPoints: Int!
 }
 
 type ResultsCompass {

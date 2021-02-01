@@ -5,4 +5,7 @@ import { Party } from '../../parties/entities/party.entity';
 export class ResultsParty extends Party {
   @Field(() => Int)
   points: number;
+
+  @Field(() => Int)
+  maxPoints: number;
 }

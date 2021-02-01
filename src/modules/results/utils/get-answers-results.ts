@@ -15,6 +15,7 @@ interface AnswersResults {
 interface BaseEffect {
   _id?: string;
   points: number;
+  maxPoints: number;
 }
 
 export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResults => {
@@ -22,48 +23,76 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
   const ideologiesObj: Record<string, ResultsIdeology> = {};
 
   answers.forEach(({ question, type, weight }) => {
-    if (type === SurveyAnswerType.NEUTRAL) {
-      return;
-    }
-
     const effectsType = type === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
+    const negativeEffect = effectsType === 'agree' ? 'disagree' : 'agree';
     const effects = question.effects[effectsType];
+    const negativeEffects = question.effects[negativeEffect];
 
     const calcEffect = <A extends BaseEntity, B extends BaseEffect>(
       inputArray: A[],
-      outputObject: Record<string, B>
+      outputObject: Record<string, B>,
+      negative = false,
+      withPoints = true,
     ) => (
         inputArray.forEach((entity) => {
-          const alreadyInObj = outputObject[entity._id] !== undefined;
-          const currentPoints = alreadyInObj ? outputObject[entity._id].points : 0;
+          const { _id } = entity;
+          const alreadyInObj = outputObject[_id] !== undefined;
 
-          outputObject[entity._id] = {
+          const getPoints = () => {
+            const currentPoints = alreadyInObj ? outputObject[_id].points : 0;
+            if (!withPoints) {
+              return currentPoints;
+            }
+
+            return negative ? currentPoints - weight : currentPoints + weight;
+          };
+
+          const getMaxPoints = () => {
+            const currentMaxPoints = alreadyInObj ? outputObject[_id].maxPoints : 0;
+            return currentMaxPoints + weight;
+          };
+
+          outputObject[_id] = {
             ...entity['_doc'],
-            points: currentPoints + weight,
+            points: getPoints(),
+            maxPoints: getMaxPoints()
           };
         })
       );
 
     calcEffect<Party, ResultsParty>(effects.parties, partiesObj);
+    calcEffect<Party, ResultsParty>(negativeEffects.parties, partiesObj, true);
     calcEffect<Ideology, ResultsIdeology>(effects.ideologies, ideologiesObj);
+    calcEffect<Ideology, ResultsIdeology>(negativeEffects.ideologies, ideologiesObj, false, false);
   });
 
   const axes = quizVersion.axes.map((axis) => {
+    const { left, right } = axis;
+
     const countPoints = (id: string) => {
       const ideology = ideologiesObj[id];
       return ideology !== undefined ? ideology.points : 0;
     };
 
+    const countMaxPoints = (leftId: string, rightId: string) => {
+      const leftIdeology = ideologiesObj[leftId];
+      const leftValue = leftIdeology !== undefined ? leftIdeology.maxPoints : 0;
+      const rightIdeology = ideologiesObj[rightId];
+      const rightValue = rightIdeology !== undefined ? rightIdeology.maxPoints : 0;
+      return leftValue + rightValue;
+    };
+
     return {
       ...axis['_doc'],
       left: {
-        ...axis.left['_doc'],
-        points: countPoints(axis.left._id),
+        ...left['_doc'],
+        points: countPoints(left._id),
       },
       right: {
-        ...axis.left['_doc'],
-        points: countPoints(axis.right._id),
-      }
+        ...right['_doc'],
+        points: countPoints(right._id),
+      },
+      maxPoints: countMaxPoints(left._id, right._id),
     };
   });
 
