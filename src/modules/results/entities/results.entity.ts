@@ -2,9 +2,11 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { ResultsParty } from './results-party.entity';
 import { ResultsAxis } from './results-axis.entity';
 import { ResultsCompass } from './results-compass.entity';
+import { BaseEntity } from '../../../shared/base/base.entity';
+import { Quiz } from '../../quizzes/entities/quiz.entity';
 
 @ObjectType()
-export class Results {
+export class Results extends BaseEntity {
   @Field(() => [ResultsAxis])
   axes: ResultsAxis[];
 
@@ -13,4 +15,7 @@ export class Results {
 
   @Field(() => [ResultsCompass])
   compasses: ResultsCompass[];
+
+  @Field(() => Quiz)
+  quiz: Quiz;
 }

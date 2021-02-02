@@ -2,21 +2,17 @@ import { ResultsParty } from '../entities/results-party.entity';
 import { ResultsAxis } from '../entities/results-axis.entity';
 import { SurveyAnswerType } from '../../surveys/anums/survey-answer-type.enum';
 import { ResultsIdeology } from '../entities/results-ideology.entity';
-import { BaseEntity } from '../../../shared/base/base.entity';
-import { Party } from '../../parties/entities/party.entity';
-import { Ideology } from '../../ideologies/entities/ideology.entity';
 import { Survey } from '../../surveys/entities/survey.entity';
+import { ResultsCompass } from '../entities/results-compass.entity';
+import { QuizCompassAxisInput } from '../../quiz-versions/dto/quiz-compass-mode.input';
 
 interface AnswersResults {
   parties: ResultsParty[];
   axes: ResultsAxis[];
+  compasses: ResultsCompass[];
 }
 
-interface BaseEffect {
-  _id?: string;
-  points: number;
-  maxPoints: number;
-}
+const sum = (numbers: number[]) => numbers.reduce((total, aNumber) => total + aNumber, 0);
 
 export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResults => {
   const partiesObj: Record<string, ResultsParty> = {};
@@ -24,49 +20,77 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
 
   answers.forEach(({ question, type, weight }) => {
     const effectsType = type === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
-    const negativeEffect = effectsType === 'agree' ? 'disagree' : 'agree';
+    const oppositeEffect = effectsType === 'agree' ? 'disagree' : 'agree';
     const effects = question.effects[effectsType];
-    const negativeEffects = question.effects[negativeEffect];
+    const oppositeEffects = question.effects[oppositeEffect];
 
-    const calcEffect = <A extends BaseEntity, B extends BaseEffect>(
-      inputArray: A[],
-      outputObject: Record<string, B>,
-      negative = false,
-      withPoints = true,
-    ) => (
-        inputArray.forEach((entity) => {
-          const { _id } = entity;
-          const alreadyInObj = outputObject[_id] !== undefined;
+    effects.parties.forEach((party) => {
+      const { _id } = party;
+      const partyObjExists = partiesObj[_id] !== undefined;
 
-          const getPoints = () => {
-            const currentPoints = alreadyInObj ? outputObject[_id].points : 0;
-            if (!withPoints) {
-              return currentPoints;
-            }
+      if (partyObjExists) {
+        partiesObj[_id].agreementPoints += weight;
+      } else {
+        partiesObj[_id] = {
+          ...party['_doc'],
+          agreementPoints: weight,
+          disagreementPoints: 0
+        };
+      }
+    });
 
-            return negative ? currentPoints - weight : currentPoints + weight;
-          };
+    oppositeEffects.parties.forEach((party) => {
+      const { _id } = party;
+      const partyObjExists = partiesObj[_id] !== undefined;
 
-          const getMaxPoints = () => {
-            const currentMaxPoints = alreadyInObj ? outputObject[_id].maxPoints : 0;
-            return currentMaxPoints + weight;
-          };
+      if (partyObjExists) {
+        partiesObj[_id].disagreementPoints += weight;
+      } else {
+        partiesObj[_id] = {
+          ...party['_doc'],
+          agreementPoints: 0,
+          disagreementPoints: weight
+        };
+      }
+    });
 
-          outputObject[_id] = {
-            ...entity['_doc'],
-            points: getPoints(),
-            maxPoints: getMaxPoints()
-          };
-        })
-      );
+    effects.ideologies.forEach((ideology) => {
+      const { _id } = ideology;
+      const ideologyObjExists = ideologiesObj[_id] !== undefined;
 
-    calcEffect<Party, ResultsParty>(effects.parties, partiesObj);
-    calcEffect<Party, ResultsParty>(negativeEffects.parties, partiesObj, true);
-    calcEffect<Ideology, ResultsIdeology>(effects.ideologies, ideologiesObj);
-    calcEffect<Ideology, ResultsIdeology>(negativeEffects.ideologies, ideologiesObj, false, false);
+      if (ideologyObjExists) {
+        ideologiesObj[_id].points += weight;
+        ideologiesObj[_id].maxPoints += weight;
+      } else {
+        ideologiesObj[_id] = {
+          ...ideology['_doc'],
+          points: weight,
+          maxPoints: weight
+        };
+      }
+    });
+
+    oppositeEffects.ideologies.forEach((ideology) => {
+      if (type !== SurveyAnswerType.NEUTRAL) {
+        return;
+      }
+
+      const { _id } = ideology;
+      const ideologyObjExists = ideologiesObj[_id] !== undefined;
+
+      if (ideologyObjExists) {
+        ideologiesObj[_id].maxPoints += weight;
+      } else {
+        ideologiesObj[_id] = {
+          ...ideology['_doc'],
+          points: 0,
+          maxPoints: weight
+        };
+      }
+    });
   });
 
-  const axes = quizVersion.axes.map((axis) => {
+  const axes = quizVersion.axes.map((axis): ResultsAxis => {
     const { left, right } = axis;
 
     const countPoints = (id: string) => {
@@ -74,13 +98,9 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
       return ideology !== undefined ? ideology.points : 0;
     };
 
-    const countMaxPoints = (leftId: string, rightId: string) => {
-      const leftIdeology = ideologiesObj[leftId];
-      const leftValue = leftIdeology !== undefined ? leftIdeology.maxPoints : 0;
-      const rightIdeology = ideologiesObj[rightId];
-      const rightValue = rightIdeology !== undefined ? rightIdeology.maxPoints : 0;
-      return leftValue + rightValue;
-    };
+    const countMaxPoints = (leftId: string, rightId: string) => (
+      countPoints(leftId) + countPoints(rightId)
+    );
 
     return {
       ...axis['_doc'],
@@ -96,7 +116,48 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     };
   });
 
-  const parties = Object.values(partiesObj).sort((a, b) => (a.points < b.points) ? 1 : -1);
+  const parties = Object.values(partiesObj)
+    .map(party => {
+      const percent = (party.agreementPoints / (party.agreementPoints + party.disagreementPoints)) * 100;
+      const percentValue = isNaN(percent) ? 0 : percent;
+      const percentAgreement = parseInt(percentValue.toFixed(0));
 
-  return { parties, axes };
+      return {
+        ...party,
+        percentAgreement,
+      };
+    })
+    .sort((a, b) => (a.percentAgreement < b.percentAgreement) ? 1 : -1);
+
+  const compasses = quizVersion.compassModes.map(({ name, ...compassMode }): ResultsCompass => {
+    const compassAxes: QuizCompassAxisInput[] = Object.values(compassMode['_doc']).filter(
+      (compassAxis) => typeof compassAxis['name'] !== 'undefined'
+    );
+    const countPoints = (id: string) => {
+      const ideology = ideologiesObj[id];
+      return ideology !== undefined ? ideology.points : 0;
+    };
+
+    const pointEntries = compassAxes.map((compassAxis): [string, number] => {
+      const { leftIdeologies, rightIdeologies, name } = compassAxis;
+      const toPoints = ({ ideology, weight }) => weight * countPoints(ideology);
+
+      const leftPoints = sum(leftIdeologies.map(toPoints));
+      const rightPoints = sum(rightIdeologies.map(toPoints));
+      const value = (rightPoints - leftPoints) / (rightPoints + leftPoints);
+      const key = Object.keys(compassMode['_doc']).find(key => (
+        compassMode['_doc'][key] && compassMode['_doc'][key].name == name
+      ));
+
+      return [key, isNaN(value) ? 0 : value];
+    });
+
+    return {
+      ...compassMode['_doc'],
+      point: Object.fromEntries(pointEntries),
+      name,
+    };
+  });
+
+  return { parties, axes, compasses };
 };

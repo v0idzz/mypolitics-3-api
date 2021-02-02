@@ -4,8 +4,11 @@ import { Party } from '../../parties/entities/party.entity';
 @ObjectType()
 export class ResultsParty extends Party {
   @Field(() => Int)
-  points: number;
+  agreementPoints: number;
 
   @Field(() => Int)
-  maxPoints: number;
+  disagreementPoints: number;
+
+  @Field(() => Int)
+  percentAgreement: number;
 }

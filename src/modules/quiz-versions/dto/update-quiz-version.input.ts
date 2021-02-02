@@ -8,8 +8,8 @@ export class UpdateQuizVersionInput {
   @Field({ nullable: true })
   publishedOn?: Date;
 
-  @Field(() => [QuizAxisInput], { nullable: 'items' })
-  axes: [QuizAxisInput];
+  @Field(() => [QuizAxisInput], { nullable: true })
+  axes?: [QuizAxisInput];
 
   @Field(() => String, { nullable: true })
   parent?: QuizVersion;

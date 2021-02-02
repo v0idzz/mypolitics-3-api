@@ -17,7 +17,10 @@ export class QuizCompassAxisInput {
   name?: TextTranslationInput;
 
   @Field(() => [QuizCompassIdeologyInput])
-  ideologies?: QuizCompassIdeologyInput[];
+  leftIdeologies?: QuizCompassIdeologyInput[];
+
+  @Field(() => [QuizCompassIdeologyInput])
+  rightIdeologies?: QuizCompassIdeologyInput[];
 }
 
 @InputType()

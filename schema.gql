@@ -88,8 +88,9 @@ type QuizCompassIdeology {
 }
 
 type QuizCompassAxis {
-  name: TextTranslation!
-  ideologies: [QuizCompassIdeology!]!
+  name: TextTranslation
+  leftIdeologies: [QuizCompassIdeology!]!
+  rightIdeologies: [QuizCompassIdeology!]!
 }
 
 type QuizCompassMode {
@@ -194,8 +195,9 @@ type ResultsParty {
   name: String!
   logoUrl: String!
   country: Country!
-  points: Int!
-  maxPoints: Int!
+  agreementPoints: Int!
+  disagreementPoints: Int!
+  percentAgreement: Int!
 }
 
 type ResultsIdeology {
@@ -217,18 +219,28 @@ type ResultsAxis {
   maxPoints: Int!
 }
 
+type ResultsCompassPoint {
+  horizontal: Float!
+  vertical: Float!
+  third: Float
+}
+
 type ResultsCompass {
   name: TextTranslation!
   horizontal: QuizCompassAxis!
   vertical: QuizCompassAxis!
   third: QuizCompassAxis
-  point: [Int!]!
+  point: ResultsCompassPoint!
 }
 
 type Results {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   axes: [ResultsAxis!]!
   parties: [ResultsParty!]!
   compasses: [ResultsCompass!]!
+  quiz: Quiz!
 }
 
 type Query {
@@ -378,7 +390,8 @@ input QuizCompassModeInput {
 
 input QuizCompassAxisInput {
   name: TextTranslationInput!
-  ideologies: [QuizCompassIdeologyInput!]!
+  leftIdeologies: [QuizCompassIdeologyInput!]!
+  rightIdeologies: [QuizCompassIdeologyInput!]!
 }
 
 input QuizCompassIdeologyInput {
@@ -388,7 +401,7 @@ input QuizCompassIdeologyInput {
 
 input UpdateQuizVersionInput {
   publishedOn: DateTime
-  axes: [QuizAxisInput]!
+  axes: [QuizAxisInput!]
   parent: String
   compassModes: [QuizCompassModeInput]!
 }

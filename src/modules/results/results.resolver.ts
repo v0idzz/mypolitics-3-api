@@ -5,11 +5,13 @@ import { BadRequestException } from '@nestjs/common';
 import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
 import { getAnswersResults } from './utils/get-answers-results';
+import { QuizzesService } from '../quizzes/quizzes.service';
 
 @Resolver(() => Results)
 export class ResultsResolver {
   constructor(
     private readonly surveysService: SurveysService,
+    private readonly quizzesService: QuizzesService,
   ) {}
 
   @Query(() => Results)
@@ -34,16 +36,20 @@ export class ResultsResolver {
       }
     });
 
-    const { parties, axes } = getAnswersResults(survey);
-
     if (!survey.finished) {
       throw new BadRequestException(ErrorsMessages[ErrorCode.SURVEY_NOT_FINISHED]);
     }
 
+    const answersResults = getAnswersResults(survey);
+    const { _id: surveyId, createdAt, updatedAt } = survey;
+    const quiz = await this.quizzesService.findOne({ versions: { $in: [survey.quizVersion] } });
+
     return {
-      parties,
-      axes,
-      compasses: [],
+      ...answersResults,
+      _id: surveyId,
+      createdAt,
+      updatedAt,
+      quiz,
     };
   }
 }
