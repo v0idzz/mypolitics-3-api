@@ -5,6 +5,7 @@ import { BaseEntity } from '../../../shared/base/base.entity';
 import { Schema as MongoSchema } from 'mongoose';
 import { QuizVersion } from '../../quiz-versions/entities/quiz-version.entity';
 import { SurveyAnswer } from './survey-answer.entity';
+import * as mongoose from 'mongoose';
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -13,7 +14,7 @@ export class Survey extends BaseEntity {
   @Field(() => [SurveyAnswer])
   answers: SurveyAnswer[];
 
-  @Prop(Boolean)
+  @Prop(mongoose.Schema.Types.Boolean)
   @Field(() => Boolean)
   finished: boolean;
 

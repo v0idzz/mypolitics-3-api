@@ -15,7 +15,7 @@ export class Party extends BaseEntity {
   @Field()
   logoUrl: string;
 
-  @Prop({ enum: Country })
+  @Prop(String)
   @Field(() => Country)
   country: Country;
 }

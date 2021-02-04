@@ -10,7 +10,7 @@ import { Ideology } from '../../ideologies/entities/ideology.entity';
 @ObjectType()
 @Schema({ timestamps: true })
 export class QuizVersion extends BaseEntity {
-  @Prop(Date)
+  @Prop(String)
   @Field(() => GraphQLISODateTime, { nullable: true })
   publishedOn?: string;
 

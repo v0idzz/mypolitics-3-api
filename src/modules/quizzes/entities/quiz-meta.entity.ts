@@ -3,6 +3,7 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Party } from '../../parties/entities/party.entity';
 import { QuizLicense } from '../enums/quiz-license.enum';
 import { Types } from 'mongoose';
+import * as mongoose from "mongoose";
 
 @ObjectType()
 @Schema()
@@ -19,11 +20,11 @@ class QuizFeatures {
   @Field(() => Int)
   questionsNumber?: number;
 
-  @Prop(Boolean)
+  @Prop(mongoose.Schema.Types.Boolean)
   @Field(() => Boolean)
   parties: boolean;
 
-  @Prop(Boolean)
+  @Prop(mongoose.Schema.Types.Boolean)
   @Field(() => Boolean)
   politiciansResults: boolean;
 
@@ -67,7 +68,7 @@ export class QuizMeta {
   @Field(() => QuizAuthor)
   author: QuizAuthor;
 
-  @Prop({ enum: QuizLicense })
+  @Prop(String)
   @Field(() => QuizLicense)
   license: QuizLicense;
 }

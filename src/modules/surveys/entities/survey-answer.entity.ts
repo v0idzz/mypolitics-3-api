@@ -12,7 +12,7 @@ export class SurveyAnswer extends BaseEntity {
   @Field(() => Question)
   question: Question;
 
-  @Prop({ enum: SurveyAnswerType })
+  @Prop(String)
   @Field(() => SurveyAnswerType)
   type: SurveyAnswerType;
 
