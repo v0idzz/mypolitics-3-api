@@ -1,4 +1,4 @@
-FROM node:10-slim AS build
+FROM node:14-slim AS build
 
 RUN mkdir /app
 
