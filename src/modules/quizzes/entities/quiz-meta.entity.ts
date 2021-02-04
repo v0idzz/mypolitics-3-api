@@ -10,6 +10,9 @@ class QuizFeatures {
   @Field(() => Boolean)
   compass?: boolean;
 
+  @Field(() => Boolean)
+  traits?: boolean;
+
   @Field(() => Int)
   axesNumber?: number;
 

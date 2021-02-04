@@ -4,6 +4,7 @@ import { ResultsAxis } from './results-axis.entity';
 import { ResultsCompass } from './results-compass.entity';
 import { BaseEntity } from '../../../shared/base/base.entity';
 import { Quiz } from '../../quizzes/entities/quiz.entity';
+import { Ideology } from '../../ideologies/entities/ideology.entity';
 
 @ObjectType()
 export class Results extends BaseEntity {
@@ -18,4 +19,7 @@ export class Results extends BaseEntity {
 
   @Field(() => Quiz)
   quiz: Quiz;
+
+  @Field(() => [Ideology])
+  traits: Ideology[];
 }

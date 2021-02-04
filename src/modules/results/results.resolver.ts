@@ -22,7 +22,7 @@ export class ResultsResolver {
       populate: {
         path: 'quizVersion answers',
         populate: {
-          path: 'question axes',
+          path: 'question axes traits',
           populate: {
             path: 'horizontal vertical third left right effects',
             populate: {

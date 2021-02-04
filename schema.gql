@@ -109,6 +109,7 @@ type QuizVersion {
   parent: QuizVersion
   questions: [Question]!
   compassModes: [QuizCompassMode]!
+  traits: [Ideology]!
   quiz: Quiz!
 }
 
@@ -147,6 +148,7 @@ type Respondent {
 
 type QuizFeatures {
   compass: Boolean!
+  traits: Boolean!
   axesNumber: Int!
   questionsNumber: Int!
   parties: Boolean!
@@ -241,6 +243,7 @@ type Results {
   parties: [ResultsParty!]!
   compasses: [ResultsCompass!]!
   quiz: Quiz!
+  traits: [Ideology!]!
 }
 
 type Query {
@@ -404,6 +407,7 @@ input UpdateQuizVersionInput {
   axes: [QuizAxisInput!]
   parent: String
   compassModes: [QuizCompassModeInput]!
+  traits: [String]!
 }
 
 input CreatePartyInput {

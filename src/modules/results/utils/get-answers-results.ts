@@ -5,11 +5,13 @@ import { ResultsIdeology } from '../entities/results-ideology.entity';
 import { Survey } from '../../surveys/entities/survey.entity';
 import { ResultsCompass } from '../entities/results-compass.entity';
 import { QuizCompassAxisInput } from '../../quiz-versions/dto/quiz-compass-mode.input';
+import { Ideology } from '../../ideologies/entities/ideology.entity';
 
 interface AnswersResults {
   parties: ResultsParty[];
   axes: ResultsAxis[];
   compasses: ResultsCompass[];
+  traits: Ideology[];
 }
 
 const sum = (numbers: number[]) => numbers.reduce((total, aNumber) => total + aNumber, 0);
@@ -17,6 +19,11 @@ const sum = (numbers: number[]) => numbers.reduce((total, aNumber) => total + aN
 export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResults => {
   const partiesObj: Record<string, ResultsParty> = {};
   const ideologiesObj: Record<string, ResultsIdeology> = {};
+
+  const countPoints = (id: string) => {
+    const ideology = ideologiesObj[id];
+    return ideology !== undefined ? ideology.points : 0;
+  };
 
   answers.forEach(({ question, type, weight }) => {
     const effectsType = type === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
@@ -93,11 +100,6 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
   const axes = quizVersion.axes.map((axis): ResultsAxis => {
     const { left, right } = axis;
 
-    const countPoints = (id: string) => {
-      const ideology = ideologiesObj[id];
-      return ideology !== undefined ? ideology.points : 0;
-    };
-
     const countMaxPoints = (leftId: string, rightId: string) => (
       countPoints(leftId) + countPoints(rightId)
     );
@@ -133,10 +135,6 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     const compassAxes: QuizCompassAxisInput[] = Object.values(compassMode['_doc']).filter(
       (compassAxis) => typeof compassAxis['name'] !== 'undefined'
     );
-    const countPoints = (id: string) => {
-      const ideology = ideologiesObj[id];
-      return ideology !== undefined ? ideology.points : 0;
-    };
 
     const pointEntries = compassAxes.map((compassAxis): [string, number] => {
       const { leftIdeologies, rightIdeologies, name } = compassAxis;
@@ -159,5 +157,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     };
   });
 
-  return { parties, axes, compasses };
+  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) > 0);
+
+  return { parties, axes, compasses, traits };
 };

@@ -60,12 +60,15 @@ export class QuizzesResolver {
   @ResolveField()
   async meta(@Parent() quiz: QuizDocument): Promise<QuizMeta> {
     await quiz.populate('versions currentVersion').execPopulate();
+    const { currentVersion } = quiz;
+    const { compassModes, axes, questions, traits } = currentVersion;
 
     const features = {
       ...quiz.meta.features,
-      compass: quiz.currentVersion.compassModes.length > 0,
-      axesNumber: quiz.currentVersion.axes.length,
-      questionsNumber: quiz.currentVersion.questions.length,
+      compass: compassModes.length > 0,
+      axesNumber: axes.length,
+      questionsNumber: questions.length,
+      traits: traits.length > 0,
     };
 
     return {

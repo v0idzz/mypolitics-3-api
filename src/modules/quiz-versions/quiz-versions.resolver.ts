@@ -24,6 +24,7 @@ export class QuizVersionsResolver {
     const version = await this.quizVersionsService.createOne({
       questions: [],
       compassModes: [],
+      traits: [],
       ...createQuizVersionInput
     });
 
@@ -41,7 +42,7 @@ export class QuizVersionsResolver {
     @Args('id', { type: () => String }) _id: string,
   ): Promise<QuizVersion> {
     return this.quizVersionsService.findOne({ _id }, {}, {
-      populate: ['axes.left', 'axes.right']
+      populate: ['axes.left', 'axes.right', 'traits']
     });
   }
 
