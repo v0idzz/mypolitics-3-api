@@ -16,5 +16,5 @@ COPY --from=build /app/dist /app
 
 EXPOSE 5000
 
-CMD [:]
+CMD ["node", "dist/main"]
 
