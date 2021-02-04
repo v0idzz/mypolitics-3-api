@@ -36,7 +36,7 @@ class QuizFeatures {
 @ObjectType()
 @Schema()
 class QuizStatistics {
-  @Prop(Number)
+  @Prop(mongoose.Schema.Types.Number)
   @Field(() => Int)
   surveysNumber: number;
 }
@@ -68,7 +68,7 @@ export class QuizMeta {
   @Field(() => QuizAuthor)
   author: QuizAuthor;
 
-  @Prop(String)
+  @Prop(mongoose.Schema.Types.String)
   @Field(() => QuizLicense)
   license: QuizLicense;
 }

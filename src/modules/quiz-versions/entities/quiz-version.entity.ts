@@ -6,11 +6,12 @@ import { QuizAxis } from './quiz-axis.entity';
 import { Question } from '../../questions/entities/question.entity';
 import { QuizCompassMode } from './quiz-compass-mode.entity';
 import { Ideology } from '../../ideologies/entities/ideology.entity';
+import * as mongoose from "mongoose";
 
 @ObjectType()
 @Schema({ timestamps: true })
 export class QuizVersion extends BaseEntity {
-  @Prop(String)
+  @Prop(mongoose.Schema.Types.String)
   @Field(() => GraphQLISODateTime, { nullable: true })
   publishedOn?: string;
 

@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { BaseEntity } from '../../../shared/base/base.entity';
 import { Country } from '../../../shared/enums/country.enum';
+import * as mongoose from "mongoose";
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -15,7 +16,7 @@ export class Party extends BaseEntity {
   @Field()
   logoUrl: string;
 
-  @Prop(String)
+  @Prop(mongoose.Schema.Types.String)
   @Field(() => Country)
   country: Country;
 }

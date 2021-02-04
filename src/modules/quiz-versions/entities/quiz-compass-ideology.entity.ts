@@ -10,7 +10,7 @@ export class QuizCompassIdeology {
   @Field(() => Ideology)
   ideology: Ideology;
 
-  @Prop(Number)
+  @Prop(mongoose.Schema.Types.Number)
   @Field(() => Int)
   weight: number;
 }

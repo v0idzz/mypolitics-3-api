@@ -4,6 +4,7 @@ import { BaseEntity } from '../../../shared/base/base.entity';
 import { Schema as MongoSchema } from 'mongoose';
 import { Question } from '../../questions/entities/question.entity';
 import { SurveyAnswerType } from '../anums/survey-answer-type.enum';
+import * as mongoose from "mongoose";
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -12,11 +13,11 @@ export class SurveyAnswer extends BaseEntity {
   @Field(() => Question)
   question: Question;
 
-  @Prop(String)
+  @Prop(mongoose.Schema.Types.String)
   @Field(() => SurveyAnswerType)
   type: SurveyAnswerType;
 
-  @Prop(Number)
+  @Prop(mongoose.Schema.Types.Number)
   @Field(() => Number)
   weight: number;
 }
