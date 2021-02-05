@@ -78,20 +78,17 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     });
 
     oppositeEffects.ideologies.forEach((ideology) => {
-      if (type !== SurveyAnswerType.NEUTRAL) {
-        return;
-      }
-
       const { _id } = ideology;
       const ideologyObjExists = ideologiesObj[_id] !== undefined;
+      const points = 2 - weight;
 
       if (ideologyObjExists) {
-        ideologiesObj[_id].maxPoints += weight;
+        ideologiesObj[_id].maxPoints += points;
       } else {
         ideologiesObj[_id] = {
           ...ideology['_doc'],
           points: 0,
-          maxPoints: weight
+          maxPoints: points,
         };
       }
     });
@@ -100,8 +97,13 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
   const axes = quizVersion.axes.map((axis): ResultsAxis => {
     const { left, right } = axis;
 
+    const countMaxPointsSingle = (id: string) => {
+      const ideology = ideologiesObj[id];
+      return ideology !== undefined ? ideology.maxPoints : 0;
+    };
+
     const countMaxPoints = (leftId: string, rightId: string) => (
-      countPoints(leftId) + countPoints(rightId)
+      countMaxPointsSingle(leftId) + countMaxPointsSingle(rightId)
     );
 
     return {
@@ -157,7 +159,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     };
   });
 
-  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) > 0);
+  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) == 2);
 
   return { parties, axes, compasses, traits };
 };
