@@ -12,8 +12,6 @@ COPY . .
 
 RUN yarn build
 
-COPY --from=build /app/dist /app
-
 EXPOSE 5000
 
 CMD ["node", "dist/main"]
