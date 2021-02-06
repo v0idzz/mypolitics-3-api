@@ -38,6 +38,11 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     return ideology !== undefined ? ideology.points : 0;
   };
 
+  const countMaxPointsSingle = (id: string) => {
+    const ideology = ideologiesObj[id];
+    return ideology !== undefined ? ideology.maxPoints : 0;
+  };
+
   answers.forEach(({ question, type, weight }) => {
     const effectsType = type === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
     const oppositeEffect = effectsType === 'agree' ? 'disagree' : 'agree';
@@ -128,11 +133,6 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
   const axes = quizVersion.axes.map((axis): ResultsAxis => {
     const { left, right } = axis;
 
-    const countMaxPointsSingle = (id: string) => {
-      const ideology = ideologiesObj[id];
-      return ideology !== undefined ? ideology.maxPoints : 0;
-    };
-
     const countMaxPoints = (leftId: string, rightId: string) => (
       countMaxPointsSingle(leftId) + countMaxPointsSingle(rightId)
     );
@@ -190,7 +190,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     };
   });
 
-  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) == 2);
+  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) === countMaxPointsSingle(_id));
 
   return { parties, axes, compasses, traits };
 };
