@@ -190,7 +190,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     };
   });
 
-  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) === countMaxPointsSingle(_id));
+  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) === 2);
 
   return { parties, axes, compasses, traits };
 };
