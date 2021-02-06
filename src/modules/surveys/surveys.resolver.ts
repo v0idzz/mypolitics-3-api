@@ -49,9 +49,18 @@ export class SurveysResolver {
   findOne(@Args('id') _id: string) {
     return this.surveysService.findOne({ _id }, {}, {
       populate: {
-        path: 'quizVersion',
+        path: 'quizVersion answers',
         populate: {
-          path: 'questions'
+          path: 'questions question',
+          populate: {
+            path: 'effects',
+            populate: {
+              path: 'agree disagree',
+              populate: {
+                path: 'parties ideologies',
+              }
+            }
+          }
         }
       }
     });

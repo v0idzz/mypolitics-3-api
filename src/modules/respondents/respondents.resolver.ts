@@ -34,7 +34,9 @@ export class RespondentsResolver {
     return this.respondentsService.findOne(
       respondent,
       {},
-      { populate: 'surveys' },
+      { populate: {
+        path: 'surveys',
+      }},
     );
   }
 

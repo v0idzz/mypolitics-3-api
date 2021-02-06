@@ -56,7 +56,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
         partiesObj[_id] = {
           ...party['_doc'],
           agreementPoints: 0,
-          disagreementPoints: weight
+          disagreementPoints: weight,
         };
       }
     });

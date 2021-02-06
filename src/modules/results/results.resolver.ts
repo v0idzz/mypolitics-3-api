@@ -6,6 +6,8 @@ import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
 import { getAnswersResults } from './utils/get-answers-results';
 import { QuizzesService } from '../quizzes/quizzes.service';
+import { CurrentRespondent } from '../../shared/decorators/current-respondent.decorator';
+import { Respondent } from '../respondents/entities/respondent.entity';
 
 @Resolver(() => Results)
 export class ResultsResolver {
@@ -17,6 +19,7 @@ export class ResultsResolver {
   @Query(() => Results)
   async results(
     @Args({ name: 'surveyId', type: () => String }) _id: string,
+    @CurrentRespondent() respondent?: Respondent
   ): Promise<Results> {
     const survey = await this.surveysService.findOne({ _id }, {}, {
       populate: {
