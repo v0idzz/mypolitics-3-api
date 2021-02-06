@@ -19,6 +19,19 @@ const sum = (numbers: number[]) => numbers.reduce((total, aNumber) => total + aN
 export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResults => {
   const partiesObj: Record<string, ResultsParty> = {};
   const ideologiesObj: Record<string, ResultsIdeology> = {};
+  const econIds = ['600afaa7c6961719741e77bf', '600afab1c6961719741e77c0', '600afab8c6961719741e77c1', '600afac0c6961719741e77c2'];
+  const induIds = ['600afae9c6961719741e77c7', '600afaefc6961719741e77c8'];
+
+  const categories = {
+    econ: {
+      weight: 0.35,
+      ideologies: econIds,
+    },
+    indu: {
+      weight: 0.08,
+      ideologies: induIds
+    },
+  };
 
   const countPoints = (id: string) => {
     const ideology = ideologiesObj[id];
@@ -30,17 +43,34 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     const oppositeEffect = effectsType === 'agree' ? 'disagree' : 'agree';
     const effects = question.effects[effectsType];
     const oppositeEffects = question.effects[oppositeEffect];
+    let questionCategory = {
+      key: 'moral',
+      weight: 0.57,
+    };
+
+    Object.keys(categories).forEach(key => {
+      const effectIds = effects.ideologies.map(i => i._id);
+      const oppositeIds = oppositeEffects.ideologies.map(i => i._id);
+      if (categories[key].ideologies.some((id) => effectIds.includes(id) || oppositeIds.includes(id))) {
+        questionCategory = {
+          key,
+          weight: categories[key].weight,
+        };
+      }
+    });
+
 
     effects.parties.forEach((party) => {
       const { _id } = party;
       const partyObjExists = partiesObj[_id] !== undefined;
+      const points = questionCategory.weight * weight;
 
       if (partyObjExists) {
-        partiesObj[_id].agreementPoints += weight;
+        partiesObj[_id].agreementPoints += points;
       } else {
         partiesObj[_id] = {
           ...party['_doc'],
-          agreementPoints: weight,
+          agreementPoints: points,
           disagreementPoints: 0
         };
       }
@@ -49,14 +79,15 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     oppositeEffects.parties.forEach((party) => {
       const { _id } = party;
       const partyObjExists = partiesObj[_id] !== undefined;
+      const points = questionCategory.weight * weight * 2;
 
       if (partyObjExists) {
-        partiesObj[_id].disagreementPoints += weight;
+        partiesObj[_id].disagreementPoints += points;
       } else {
         partiesObj[_id] = {
           ...party['_doc'],
           agreementPoints: 0,
-          disagreementPoints: weight,
+          disagreementPoints: points,
         };
       }
     });
