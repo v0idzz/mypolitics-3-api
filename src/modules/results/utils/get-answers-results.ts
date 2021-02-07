@@ -202,7 +202,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     const points = countPoints(_id);
     const maxPoints = countMaxPointsSingle(_id);
 
-    return points === maxPoints && maxPoints > 0;
+    return;
   });
 
   return { parties, axes, compasses, traits };
