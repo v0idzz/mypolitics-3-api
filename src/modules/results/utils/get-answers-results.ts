@@ -115,8 +115,9 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
 
     oppositeEffects.ideologies.forEach((ideology) => {
       const { _id } = ideology;
+      const isTrait = quizVersion.traits.map(t => t._id).includes(_id);
       const ideologyObjExists = ideologiesObj[_id] !== undefined;
-      const points = 2 - weight;
+      const points = isTrait ? 2 : 2 - weight;
 
       if (ideologyObjExists) {
         ideologiesObj[_id].maxPoints += points;
@@ -202,7 +203,7 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     const points = countPoints(_id);
     const maxPoints = countMaxPointsSingle(_id);
 
-    return;
+    return points === maxPoints;
   });
 
   return { parties, axes, compasses, traits };
