@@ -274,6 +274,7 @@ type Mutation {
   createQuestion(createQuestionInput: CreateQuestionInput!, quizVersion: String!): Question!
   createManyQuestions(createManyQuestionsInput: [CreateQuestionInput!]!, quizVersion: String!): [Question!]!
   updateQuestion(updateQuestionInput: UpdateQuestionInput!, id: String!): Question!
+  addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, partyId: String!): Boolean!
 }
 
 input CreateRespondentInput {
@@ -440,4 +441,9 @@ input QuestionPositiveEffectInput {
 input UpdateQuestionInput {
   text: TextTranslationInput!
   effects: QuestionEffectsInput!
+}
+
+input AddPartyAnswersInput {
+  questionText: TextTranslationInput!
+  answer: SurveyAnswerType!
 }

@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { QuestionsService } from './questions.service';
 import { Question } from './entities/question.entity';
 import { CreateQuestionInput } from './dto/create-question.input';
@@ -6,6 +6,10 @@ import { UpdateQuestionInput } from './dto/update-question.input';
 import { UseGuards } from '@nestjs/common';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
+import { AddPartyAnswersInput } from './dto/add-party-answers-input';
+import { SurveyAnswerType } from '../surveys/anums/survey-answer-type.enum';
+import { ObjectId } from 'mongoose';
+import { PartiesService } from '../parties/parties.service';
 
 @Resolver(() => Question)
 @UseGuards(AdminGuard)
@@ -13,6 +17,7 @@ export class QuestionsResolver {
   constructor(
     private readonly questionsService: QuestionsService,
     private readonly quizVersionsService: QuizVersionsService,
+    private readonly partiesService: PartiesService,
   ) {}
 
   @Mutation(() => Question)
@@ -66,5 +71,33 @@ export class QuestionsResolver {
         }
       }
     });
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AdminGuard)
+  async addPartyAnswers(
+    @Args({ name: 'partyId', type: () => String }) partyId: string,
+    @Args({ name: 'addPartyAnswersInput', type: () => [AddPartyAnswersInput] }) addPartyAnswersInput: AddPartyAnswersInput[],
+  ): Promise<boolean> {
+    const party = await this.partiesService.findOne({ _id: partyId });
+
+    for (let i = 0; i < addPartyAnswersInput.length; i++) {
+      const { questionText, answer } = addPartyAnswersInput[i];
+      if (answer !== SurveyAnswerType.NEUTRAL) {
+        const answerName = answer === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
+
+        try {
+          await this.questionsService.updateOne({ text: questionText }, {
+            $push: {
+              [`effects.${answerName}.parties`]: party
+            }
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    return true;
   }
 }

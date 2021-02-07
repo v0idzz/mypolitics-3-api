@@ -172,10 +172,18 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     const pointEntries = compassAxes.map((compassAxis): [string, number] => {
       const { leftIdeologies, rightIdeologies, name } = compassAxis;
       const toPoints = ({ ideology, weight }) => weight * countPoints(ideology);
+      const toMaxPoints = ({ ideology, weight }) => weight * countMaxPointsSingle(ideology);
 
-      const leftPoints = sum(leftIdeologies.map(toPoints));
-      const rightPoints = sum(rightIdeologies.map(toPoints));
-      const value = (rightPoints - leftPoints) / (rightPoints + leftPoints);
+      let leftPoints = sum(leftIdeologies.map(toPoints));
+      let rightPoints = sum(rightIdeologies.map(toPoints));
+      const leftMax = sum(leftIdeologies.map(toMaxPoints));
+      const rightMax = sum(rightIdeologies.map(toMaxPoints));
+      const maxPoints = leftMax + rightMax;
+      const centerPoints = (leftPoints + rightPoints) / maxPoints;
+      const halfCenter = centerPoints / 2;
+      leftPoints += halfCenter;
+      rightPoints += halfCenter;
+      const value = (rightPoints - leftPoints) / maxPoints;
       const key = Object.keys(compassMode['_doc']).find(key => (
         compassMode['_doc'][key] && compassMode['_doc'][key].name == name
       ));
@@ -190,7 +198,12 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     };
   });
 
-  const traits = quizVersion.traits.filter(({ _id }) => countPoints(_id) === 2);
+  const traits = quizVersion.traits.filter(({ _id }) => {
+    const points = countPoints(_id);
+    const maxPoints = countMaxPointsSingle(_id);
+
+    return points === maxPoints && maxPoints > 0;
+  });
 
   return { parties, axes, compasses, traits };
 };
