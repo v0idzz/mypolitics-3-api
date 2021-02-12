@@ -85,9 +85,9 @@ export abstract class BaseService<T extends Document> {
         { ...defaultOptions, ...options },
       );
     } catch (err) {
-      this.serviceLogger.error(`Could not update ${this.modelName} entry:`);
-      this.serviceLogger.error(err);
-      throw new InternalServerErrorException();
+      // this.serviceLogger.error(`Could not update ${this.modelName} entry:`);
+      // this.serviceLogger.error(err);
+      // throw new InternalServerErrorException();
     }
   }
 

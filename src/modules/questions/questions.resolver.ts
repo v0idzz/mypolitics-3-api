@@ -8,7 +8,6 @@ import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
 import { AddPartyAnswersInput } from './dto/add-party-answers-input';
 import { SurveyAnswerType } from '../surveys/anums/survey-answer-type.enum';
-import { ObjectId } from 'mongoose';
 import { PartiesService } from '../parties/parties.service';
 
 @Resolver(() => Question)
@@ -87,13 +86,23 @@ export class QuestionsResolver {
         const answerName = answer === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
 
         try {
+          const question = await this.questionsService.findOneOrNull({ text: questionText });
+          if (question === null) {
+            console.log(`Question does not exists: ${questionText.pl}`);
+            continue;
+          }
+
           await this.questionsService.updateOne({ text: questionText }, {
+            $pullAll: {
+              'effects.agree.parties': [party._id],
+              'effects.disagree.parties': [party._id]
+            },
             $push: {
               [`effects.${answerName}.parties`]: party
             }
           });
         } catch (e) {
-          console.error(e);
+          // console.error(e);
         }
       }
     }
