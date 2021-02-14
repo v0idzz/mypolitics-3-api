@@ -76,9 +76,16 @@ export class QuestionsResolver {
   @UseGuards(AdminGuard)
   async addPartyAnswers(
     @Args({ name: 'partyId', type: () => String }) partyId: string,
+    @Args({ name: 'quizVersionId', type: () => String }) quizVersionId: string,
     @Args({ name: 'addPartyAnswersInput', type: () => [AddPartyAnswersInput] }) addPartyAnswersInput: AddPartyAnswersInput[],
   ): Promise<boolean> {
     const party = await this.partiesService.findOne({ _id: partyId });
+    const quizVersion = await this.quizVersionsService.findOne({ _id: quizVersionId }, {}, {
+      populate: {
+        path: 'questions',
+      }
+    });
+    const questionsIds = quizVersion.questions.map(q => q._id);
 
     for (let i = 0; i < addPartyAnswersInput.length; i++) {
       const { questionText, answer } = addPartyAnswersInput[i];
@@ -86,18 +93,21 @@ export class QuestionsResolver {
         const answerName = answer === SurveyAnswerType.AGREE ? 'agree' : 'disagree';
 
         try {
-          const question = await this.questionsService.findOneOrNull({ text: questionText });
+          const question = await this.questionsService.findOneOrNull({ text: questionText, _id: { $in: questionsIds, } });
           if (question === null) {
             console.log(`Question does not exists: ${questionText.pl}`);
             continue;
           }
 
-          await this.questionsService.updateOne({ text: questionText }, {
-            $pullAll: {
-              'effects.agree.parties': [party._id],
-              'effects.disagree.parties': [party._id]
+          await question.updateOne({
+            $pull: {
+              'effects.agree.parties': party._id,
+              'effects.disagree.parties': party._id,
             },
-            $push: {
+          }, { multi: true });
+
+          await question.updateOne({
+            $addToSet: {
               [`effects.${answerName}.parties`]: party
             }
           });

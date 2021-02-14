@@ -274,7 +274,7 @@ type Mutation {
   createQuestion(createQuestionInput: CreateQuestionInput!, quizVersion: String!): Question!
   createManyQuestions(createManyQuestionsInput: [CreateQuestionInput!]!, quizVersion: String!): [Question!]!
   updateQuestion(updateQuestionInput: UpdateQuestionInput!, id: String!): Question!
-  addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, partyId: String!): Boolean!
+  addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, quizVersionId: String!, partyId: String!): Boolean!
 }
 
 input CreateRespondentInput {
