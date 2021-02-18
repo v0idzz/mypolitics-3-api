@@ -6,6 +6,7 @@ import { TextTranslation } from '../../../shared/entities/text-translation.entit
 import { QuizVersion } from '../../quiz-versions/entities/quiz-version.entity';
 import * as mongoose from 'mongoose';
 import { QuizMeta } from './quiz-meta.entity';
+import { QuizType } from '../enums/quiz-type.enum';
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -17,6 +18,9 @@ export class Quiz extends BaseEntity {
   @Prop()
   @Field(() => String)
   logoUrl: string;
+
+  @Field(() => QuizType)
+  type?: QuizType;
 
   @Prop(raw(TextTranslation))
   @Field(() => TextTranslation)

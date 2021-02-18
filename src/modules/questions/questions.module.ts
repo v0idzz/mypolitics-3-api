@@ -22,7 +22,7 @@ import { PartiesModule } from '../parties/parties.module';
       { name: QuestionPositiveEffect.name, schema: QuestionPositiveEffectSchema },
       { name: QuizVersion.name, schema: QuizVersionSchema },
       { name: Party.name, schema: PartySchema },
-    ]),
+    ], 'main'),
   ],
   providers: [QuestionsResolver, QuizVersionsService, QuestionsService, PartiesService, Logger]
 })

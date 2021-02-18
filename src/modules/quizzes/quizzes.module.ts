@@ -13,7 +13,7 @@ import quizzesConfig from '../../config/quizzes.config';
     MongooseModule.forFeature([
       { name: Quiz.name, schema: QuizSchema },
       { name: QuizMeta.name, schema: QuizMetaSchema },
-    ]),
+    ], 'main'),
   ],
   providers: [ConfigService, QuizzesResolver, QuizzesService, Logger],
   exports: [ConfigService]

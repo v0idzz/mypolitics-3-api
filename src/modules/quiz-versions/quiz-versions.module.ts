@@ -14,7 +14,7 @@ import { Quiz, QuizSchema } from '../quizzes/entities/quiz.entity';
       { name: QuizVersion.name, schema: QuizVersionSchema },
       { name: QuizAxis.name, schema: QuizAxisSchema },
       { name: Quiz.name, schema: QuizSchema },
-    ]),
+    ], 'main'),
     QuizzesModule,
   ],
   providers: [QuizzesService, QuizVersionsResolver, QuizVersionsService, Logger]

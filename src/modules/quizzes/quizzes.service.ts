@@ -19,4 +19,9 @@ export class QuizzesService extends BaseService<QuizDocument> {
     const slugs = this.configService.get<string[]>('quizzes.featuredSlugs');
     return this.findMany({ slug: { $in: slugs } });
   }
+
+  isFeatured(quiz: Quiz): boolean {
+    const slugs = this.configService.get<string[]>('quizzes.featuredSlugs');
+    return slugs.includes(quiz.slug);
+  }
 }

@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Respondent, RespondentSchema } from './entities/respondent.entity';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: Respondent.name, schema: RespondentSchema }])],
+  imports: [MongooseModule.forFeature([{name: Respondent.name, schema: RespondentSchema }], 'main')],
   providers: [RespondentsResolver, RespondentsService, Logger]
 })
 export class RespondentsModule {}

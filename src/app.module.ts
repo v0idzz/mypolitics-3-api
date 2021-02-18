@@ -26,7 +26,7 @@ import { Respondent, RespondentSchema } from './modules/respondents/entities/res
   imports: [
     MongooseModule.forFeature([
       { name: Respondent.name, schema: RespondentSchema },
-    ]),
+    ], 'main'),
     GraphQLFederationModule.forRootAsync({
       imports: [ConfigModule.forFeature(graphqlConfig)],
       useFactory: async (configService: ConfigService) => (
@@ -46,9 +46,18 @@ import { Respondent, RespondentSchema } from './modules/respondents/entities/res
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule.forFeature(mongooseConfig)],
-      useFactory: async (configService: ConfigService) => (
-        configService.get('mongoose')
-      ),
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('mongoose.mainUri'),
+      }),
+      connectionName: 'main',
+      inject: [ConfigService],
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule.forFeature(mongooseConfig)],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('mongoose.classicUri'),
+      }),
+      connectionName: 'classic',
       inject: [ConfigService],
     }),
     ConfigModule.forRoot(),

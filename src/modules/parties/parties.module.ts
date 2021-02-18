@@ -8,7 +8,7 @@ import { Party, PartySchema } from './entities/party.entity';
   imports: [
     MongooseModule.forFeature([
       { name: Party.name, schema: PartySchema },
-    ]),
+    ], 'main'),
   ],
   providers: [PartiesResolver, PartiesService, Logger]
 })

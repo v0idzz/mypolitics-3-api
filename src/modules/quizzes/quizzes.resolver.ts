@@ -1,12 +1,12 @@
-import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { QuizzesService } from './quizzes.service';
 import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { CreateQuizInput } from './dto/create-quiz.input';
 import { UpdateQuizInput } from './dto/update-quiz.input';
 import { UseGuards } from '@nestjs/common';
-import { RespondentGuard } from '../../shared/guards/respondent.guard';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizMeta } from './entities/quiz-meta.entity';
+import { QuizType } from './enums/quiz-type.enum';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
@@ -75,5 +75,13 @@ export class QuizzesResolver {
       ...quiz.meta,
       features,
     };
+  }
+
+  @ResolveField()
+  async type(@Parent() quiz: QuizDocument): Promise<QuizType> {
+    const isFeatured = this.quizzesService.isFeatured(quiz);
+    const notClassicType = isFeatured ? QuizType.OFFICIAL : QuizType.COMMUNITY;
+    const isClassic = quiz.slug === 'classic';
+    return isClassic ? QuizType.CLASSIC : notClassicType;
   }
 }

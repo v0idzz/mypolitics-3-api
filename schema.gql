@@ -183,11 +183,18 @@ type Quiz {
   updatedAt: DateTime!
   slug: String!
   logoUrl: String!
+  type: QuizType!
   title: TextTranslation!
   description: TextTranslation!
   meta: QuizMeta!
   currentVersion: QuizVersion!
   versions: [QuizVersion]!
+}
+
+enum QuizType {
+  OFFICIAL
+  COMMUNITY
+  CLASSIC
 }
 
 type ResultsParty {

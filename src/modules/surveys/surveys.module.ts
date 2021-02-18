@@ -20,7 +20,7 @@ import { QuizzesService } from '../quizzes/quizzes.service';
       { name: Respondent.name, schema: RespondentSchema },
       { name: SurveyAnswer.name, schema: SurveyAnswerSchema },
       { name: Quiz.name, schema: QuizSchema }
-    ]),
+    ], 'main'),
   ],
   providers: [QuizzesService, SurveysResolver, SurveysService, Logger, RespondentsService]
 })

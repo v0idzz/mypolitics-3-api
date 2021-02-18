@@ -8,7 +8,7 @@ import { Ideology, IdeologySchema } from './entities/ideology.entity';
   imports: [
     MongooseModule.forFeature([
       { name: Ideology.name, schema: IdeologySchema },
-    ]),
+    ], 'main'),
   ],
   providers: [IdeologiesResolver, IdeologiesService, Logger]
 })
