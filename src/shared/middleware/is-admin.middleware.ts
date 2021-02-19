@@ -8,6 +8,7 @@ export class IsAdminMiddleware implements NestMiddleware {
     const adminHeader = req.headers[Headers.ADMIN];
     if (!adminHeader || typeof adminHeader !== 'string') {
       req['isAdmin'] = false;
+
       next();
       return;
     }
