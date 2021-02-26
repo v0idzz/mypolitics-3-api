@@ -27,7 +27,7 @@ export abstract class BaseService<T extends Document> {
   ): Promise<T> {
     try {
       return await this.model.findOne(
-        conditions as any,
+        conditions,
         projection,
         options,
       );
@@ -94,7 +94,7 @@ export abstract class BaseService<T extends Document> {
   async deleteOne(
     conditions: FilterQuery<T>,
     options?: QueryOptions | null
-  ): Promise<T> {
+  ): Promise<any> {
     try {
       return await this.model.deleteOne(
         conditions,
