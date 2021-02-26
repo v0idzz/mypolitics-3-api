@@ -10,6 +10,7 @@ import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import Cookies from 'cookies';
 import { Cookies as ConstCookies } from '../../constants';
 import dayjs from 'dayjs';
+import { AdminGuard } from '../../shared/guards/admin.guard';
 
 @Resolver(() => Respondent)
 export class RespondentsResolver {
@@ -68,5 +69,11 @@ export class RespondentsResolver {
   @UseGuards(RespondentGuard)
   removeMe(@CurrentRespondent() respondent: Respondent) {
     return this.respondentsService.deleteOne(respondent);
+  }
+
+  @Query(() => Boolean)
+  @UseGuards(AdminGuard)
+  verifyAdmin() {
+    return true;
   }
 }

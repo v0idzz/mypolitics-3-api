@@ -24,15 +24,7 @@ export class QuestionsResolver {
     @Args({ name: 'quizVersion', type: () => String }) quizVersion: string,
     @Args('createQuestionInput') createQuestionInput: CreateQuestionInput,
   ): Promise<Question> {
-    const question = await this.questionsService.createOne(createQuestionInput);
-
-    await this.quizVersionsService.updateOne({
-      _id: quizVersion,
-    }, {
-      $push: { questions: question },
-    });
-
-    return question;
+    return await this.questionsService.createOne(createQuestionInput);
   }
 
   @Mutation(() => [Question])

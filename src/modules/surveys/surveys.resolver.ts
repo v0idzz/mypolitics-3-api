@@ -103,4 +103,31 @@ export class SurveysResolver {
 
     return survey;
   }
+
+  @Mutation(() => Boolean)
+  async deleteSurvey(
+    @Args({ name: 'id', type: () => String }) _id: string,
+    @CurrentRespondent() { _id: respondentId }: Respondent
+  ) {
+    const respondent = await this.respondentsService.findOneOrNull({
+      _id: { $eq: respondentId },
+      surveys: { $all: [_id] },
+    });
+
+    const survey = await this.surveysService.findOne({ _id });
+
+    if (!respondent) {
+      throw new UnauthorizedException(
+        ErrorsMessages[ErrorCode.NOT_AUTHORIZED],
+      );
+    }
+
+    await respondent.updateOne({
+      $pull: {
+        surveys: survey._id,
+      },
+    });
+
+    return true;
+  }
 }

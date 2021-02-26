@@ -3,6 +3,8 @@ import { QuizAxisInput } from './quiz-axis.input';
 import { QuizVersion } from '../entities/quiz-version.entity';
 import { QuizCompassModeInput } from './quiz-compass-mode.input';
 import { Ideology } from '../../ideologies/entities/ideology.entity';
+import { Question } from '../../questions/entities/question.entity';
+import { Party } from '../../parties/entities/party.entity';
 
 @InputType()
 export class UpdateQuizVersionInput {
@@ -20,4 +22,13 @@ export class UpdateQuizVersionInput {
 
   @Field(() => [String], { nullable: 'items' })
   traits: Ideology[];
+
+  @Field(() => [String], { nullable: 'items' })
+  questions: Question[];
+
+  @Field(() => [String], { nullable: 'items' })
+  ideologies: Ideology[];
+
+  @Field(() => [String], { nullable: 'items' })
+  parties: Party[];
 }

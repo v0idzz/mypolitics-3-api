@@ -38,6 +38,9 @@ export class Quiz extends BaseEntity {
   @Field(() => QuizVersion)
   currentVersion: QuizVersion;
 
+  @Field(() => QuizVersion)
+  lastUpdatedVersion?: QuizVersion;
+
   @Prop({ type: [{ type: Types.ObjectId, ref: 'QuizVersion' }] })
   @Field(() => [QuizVersion], { nullable: 'items' })
   versions: QuizVersion[];

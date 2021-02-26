@@ -6,8 +6,7 @@ import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
 import { getAnswersResults } from './utils/get-answers-results';
 import { QuizzesService } from '../quizzes/quizzes.service';
-import { ResultsClassicService } from '../results-classic/results-classic.service';
-import { QuizType } from '../quizzes/enums/quiz-type.enum';
+import { ResultsClassicService } from '../results-classic/results-classic.service';;
 
 @Resolver(() => Results)
 export class ResultsResolver {

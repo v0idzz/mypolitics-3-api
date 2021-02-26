@@ -6,7 +6,10 @@ import { QuizVersion } from './entities/quiz-version.entity';
 import { UpdateQuizVersionInput } from './dto/update-quiz-version.input';
 import { CreateQuizVersionInput } from './dto/create-quiz-version.input';
 import { QuizzesService } from '../quizzes/quizzes.service';
+import { diff, observableDiff, applyChange } from 'deep-diff';
 import { Quiz } from '../quizzes/entities/quiz.entity';
+import { quizVersionToInput } from './utils/quiz-version-to-input';
+import merge from 'deepmerge';
 
 @Resolver(() => QuizVersion)
 export class QuizVersionsResolver {
@@ -25,6 +28,8 @@ export class QuizVersionsResolver {
       questions: [],
       compassModes: [],
       traits: [],
+      parties: [],
+      ideologies: [],
       ...createQuizVersionInput
     });
 
@@ -44,6 +49,38 @@ export class QuizVersionsResolver {
     return this.quizVersionsService.findOne({ _id }, {}, {
       populate: ['axes.left', 'axes.right', 'traits']
     });
+  }
+
+  @Mutation(() => QuizVersion)
+  @UseGuards(AdminGuard)
+  async saveQuizVersion(
+    @Args({ name: 'id', type: () => String }) _id: string,
+    @Args({ name: 'publish', type: () => Boolean }) publish: boolean,
+    @Args('saveQuizVersionInput') saveQuizVersionInput: UpdateQuizVersionInput,
+  ): Promise<QuizVersion> {
+    const version = await this.quizVersionsService.findOne({ _id });
+    const versionInput = quizVersionToInput(version);
+    observableDiff(versionInput, saveQuizVersionInput, function (d) {
+      applyChange(versionInput, saveQuizVersionInput, d);
+    });
+
+    const currentVersion = await this.quizVersionsService.createOne({
+      ...(versionInput as any),
+      ...(publish ? {
+        publishedOn: new Date().toISOString(),
+      } : {})
+    });
+
+    const quiz = await this.quizzesService.findOne({ versions: { $in: [version] } });
+
+    await this.quizzesService.updateOne({
+      _id: quiz._id,
+    }, {
+      currentVersion,
+      $push: { versions: currentVersion },
+    });
+
+    return currentVersion;
   }
 
   @Mutation(() => QuizVersion)

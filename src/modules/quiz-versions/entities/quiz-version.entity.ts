@@ -7,6 +7,7 @@ import { Question } from '../../questions/entities/question.entity';
 import { QuizCompassMode } from './quiz-compass-mode.entity';
 import { Ideology } from '../../ideologies/entities/ideology.entity';
 import * as mongoose from "mongoose";
+import { Party } from '../../parties/entities/party.entity';
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -34,6 +35,14 @@ export class QuizVersion extends BaseEntity {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Ideology' }] })
   @Field(() => [Ideology], { nullable: 'items' })
   traits: Ideology[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Ideology' }] })
+  @Field(() => [Ideology], { nullable: 'items' })
+  ideologies: Ideology[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Party' }] })
+  @Field(() => [Party], { nullable: 'items' })
+  parties: Party[];
 }
 
 export type QuizVersionDocument = QuizVersion & Document;

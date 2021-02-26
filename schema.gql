@@ -110,6 +110,8 @@ type QuizVersion {
   questions: [Question]!
   compassModes: [QuizCompassMode]!
   traits: [Ideology]!
+  ideologies: [Ideology]!
+  parties: [Party]!
   quiz: Quiz!
 }
 
@@ -188,6 +190,7 @@ type Quiz {
   description: TextTranslation!
   meta: QuizMeta!
   currentVersion: QuizVersion!
+  lastUpdatedVersion: QuizVersion!
   versions: [QuizVersion]!
 }
 
@@ -256,6 +259,7 @@ type Results {
 type Query {
   respondent(code: [String!]!): Respondent!
   meRespondent: Respondent!
+  verifyAdmin: Boolean!
   survey(id: String!): Survey!
   quiz(slug: String!): Quiz!
   featuredQuizzes: [Quiz!]!
@@ -270,11 +274,13 @@ type Mutation {
   removeMe: Respondent!
   createSurvey(createSurveyInput: CreateSurveyInput!): Survey!
   updateSurvey(updateSurveyInput: UpdateSurveyInput!, id: String!): Survey!
+  deleteSurvey(id: String!): Boolean!
   createQuiz(createQuizInput: CreateQuizInput!): Quiz!
   updateQuiz(updateQuizInput: UpdateQuizInput!, id: String!): Quiz!
   createIdeology(createIdeologyInput: CreateIdeologyInput!): Ideology!
   updateIdeology(updateIdeologyInput: UpdateIdeologyInput!, id: String!): Ideology!
   createQuizVersion(createQuizVersionInput: CreateQuizVersionInput!, quizId: String!): QuizVersion!
+  saveQuizVersion(saveQuizVersionInput: UpdateQuizVersionInput!, publish: Boolean!, id: String!): QuizVersion!
   updateQuizVersion(updateQuizVersionInput: UpdateQuizVersionInput!, id: String!): QuizVersion!
   createParty(createPartyInput: CreatePartyInput!): Party!
   updateParty(updatePartyInput: UpdatePartyInput!, id: String!): Party!
@@ -416,6 +422,9 @@ input UpdateQuizVersionInput {
   parent: String
   compassModes: [QuizCompassModeInput]!
   traits: [String]!
+  questions: [String]!
+  ideologies: [String]!
+  parties: [String]!
 }
 
 input CreatePartyInput {

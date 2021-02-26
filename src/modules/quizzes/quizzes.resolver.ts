@@ -7,6 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizMeta } from './entities/quiz-meta.entity';
 import { QuizType } from './enums/quiz-type.enum';
+import { QuizVersion } from '../quiz-versions/entities/quiz-version.entity';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
@@ -61,14 +62,16 @@ export class QuizzesResolver {
   async meta(@Parent() quiz: QuizDocument): Promise<QuizMeta> {
     await quiz.populate('versions currentVersion').execPopulate();
     const { currentVersion } = quiz;
-    const { compassModes, axes, questions, traits } = currentVersion;
+    const { compassModes, axes, questions, traits, parties, ideologies } = currentVersion;
 
     const features = {
       ...quiz.meta.features,
-      compass: compassModes.length > 0,
       axesNumber: axes.length,
       questionsNumber: questions.length,
+      compass: compassModes.length > 0,
       traits: traits.length > 0,
+      parties: parties.length > 0,
+      ideologies: ideologies.length > 0,
     };
 
     return {
@@ -83,5 +86,14 @@ export class QuizzesResolver {
     const notClassicType = isFeatured ? QuizType.OFFICIAL : QuizType.COMMUNITY;
     const isClassic = quiz.slug === 'classic';
     return isClassic ? QuizType.CLASSIC : notClassicType;
+  }
+
+  @ResolveField()
+  async lastUpdatedVersion(@Parent() quiz: QuizDocument): Promise<QuizVersion> {
+    const versions = quiz.populate('versions').versions.sort((a, b) => (
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    ));
+
+    return versions[0];
   }
 }
