@@ -27,7 +27,7 @@ export abstract class BaseService<T extends Document> {
   ): Promise<T> {
     try {
       return await this.model.findOne(
-        conditions,
+        conditions as any,
         projection,
         options,
       );
