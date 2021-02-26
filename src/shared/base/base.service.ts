@@ -85,19 +85,19 @@ export abstract class BaseService<T extends Document> {
         { ...defaultOptions, ...options },
       );
     } catch (err) {
-      // this.serviceLogger.error(`Could not update ${this.modelName} entry:`);
-      // this.serviceLogger.error(err);
-      // throw new InternalServerErrorException();
+      this.serviceLogger.error(`Could not update ${this.modelName} entry:`);
+      this.serviceLogger.error(err);
+      throw new InternalServerErrorException();
     }
   }
 
   async deleteOne(
-    conditions: Partial<Record<keyof T, unknown>>,
+    conditions: FilterQuery<T>,
     options?: QueryOptions | null
   ): Promise<T> {
     try {
       return await this.model.deleteOne(
-        conditions as FilterQuery<T>,
+        conditions,
         options,
       );
     } catch (err) {
