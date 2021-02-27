@@ -15,8 +15,8 @@ export const parties: Party[] = [
     name: 'Nowoczesna',
     logoUrl: 'https://files.mypolitics.pl/mypolitics2/cdnv2-nowoczesna_27611eba93.png',
     spheresValues: {
-      economics: 0.4,
-      social: -0.35,
+      economics: 0.5,
+      social: -0.7,
     },
   },
   {
@@ -34,7 +34,7 @@ export const parties: Party[] = [
     logoUrl: 'https://files.mypolitics.pl/mypolitics2/cdnv2-korwin_78b4e81ca0.png',
     spheresValues: {
       economics: 0.9,
-      social: 0.15,
+      social: -0.3,
     },
   },
   {
@@ -71,6 +71,15 @@ export const parties: Party[] = [
     spheresValues: {
       economics: 0.2,
       social: -0.1,
+    },
+  },
+  {
+    _id: 'classic-ued',
+    name: 'Unia Europejskich Demokratów',
+    logoUrl: 'https://files.mypolitics.pl/mypolitics2/cdnv2-ued_86db934d96.jpg',
+    spheresValues: {
+      economics: 0.2,
+      social: -0.5,
     },
   },
   {
@@ -111,20 +120,11 @@ export const parties: Party[] = [
   },
   {
     _id: '600afd6c3ab6c926c8e660f1',
-    name: 'Libertarianie',
-    logoUrl: 'https://files.mypolitics.pl/mypolitics2/cdnv2-libertarianie_4344d35acc.png',
+    name: 'Libertarianie/Możemy',
+    logoUrl: 'https://files.mypolitics.pl/mypolitics2/cdnv2-cdnv2_libmozemy_dc915b598d.png',
     spheresValues: {
       economics: 0.8,
       social: -0.55,
-    },
-  },
-  {
-    _id: '600afd5c3ab6c926c8e660f0',
-    name: 'Partia Możemy',
-    logoUrl: 'https://files.mypolitics.pl/mypolitics2/cdnv2-mozemy_624e12977b.png',
-    spheresValues: {
-      economics: 0.65,
-      social: -0.5,
     },
   },
   {
