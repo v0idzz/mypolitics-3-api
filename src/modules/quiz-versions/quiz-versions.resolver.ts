@@ -1,15 +1,16 @@
 import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { QuizVersionsService } from './quiz-versions.service';
-import { UseGuards } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizVersion } from './entities/quiz-version.entity';
 import { UpdateQuizVersionInput } from './dto/update-quiz-version.input';
 import { CreateQuizVersionInput } from './dto/create-quiz-version.input';
 import { QuizzesService } from '../quizzes/quizzes.service';
-import { diff, observableDiff, applyChange } from 'deep-diff';
+import { observableDiff, applyChange } from 'deep-diff';
 import { Quiz } from '../quizzes/entities/quiz.entity';
 import { quizVersionToInput } from './utils/quiz-version-to-input';
-import merge from 'deepmerge';
+import { ErrorsMessages } from '../../constants';
+import { ErrorCode } from '../../types';
 
 @Resolver(() => QuizVersion)
 export class QuizVersionsResolver {
@@ -89,6 +90,12 @@ export class QuizVersionsResolver {
     @Args({ name: 'id', type: () => String }) _id: string,
     @Args('updateQuizVersionInput') updateQuizVersionInput: UpdateQuizVersionInput,
   ): Promise<QuizVersion> {
+    const quizVersion = await this.quizVersionsService.findOne({ _id });
+
+    if (!!quizVersion.publishedOn) {
+      throw new UnauthorizedException(ErrorsMessages[ErrorCode.QUIZ_VERSION_PUBLISHED]);
+    }
+
     return this.quizVersionsService.updateOne({ _id }, updateQuizVersionInput);
   }
 

@@ -20,6 +20,10 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
   [ErrorCode.SURVEY_NOT_FINISHED]: {
     code: ErrorCode.SURVEY_NOT_FINISHED,
     text: 'Survey has not been finished yet',
+  },
+  [ErrorCode.QUIZ_VERSION_PUBLISHED]: {
+    code: ErrorCode.QUIZ_VERSION_PUBLISHED,
+    text: 'Quiz version has been published',
   }
 };
 

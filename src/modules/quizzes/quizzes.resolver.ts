@@ -33,12 +33,9 @@ export class QuizzesResolver {
   ): Promise<Quiz> {
     return this.quizzesService.findOne({ slug }, {}, {
       populate: {
-        path: 'versions currentVersion',
+        path: 'versions currentVersion lastUpdatedVersion',
         populate: {
-          path: 'axes questions',
-          populate: {
-            path: 'left right'
-          }
+          path: 'ideologies axes traits questions parties',
         }
       }
     });

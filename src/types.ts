@@ -4,6 +4,7 @@ export const enum ErrorCode {
   RESPONDENT_HEADER_NOT_PROVIDED,
   SURVEY_FINISHED,
   SURVEY_NOT_FINISHED,
+  QUIZ_VERSION_PUBLISHED,
 }
 
 export interface ErrorMessage {
