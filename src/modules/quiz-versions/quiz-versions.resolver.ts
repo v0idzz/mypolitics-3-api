@@ -67,9 +67,7 @@ export class QuizVersionsResolver {
 
     const currentVersion = await this.quizVersionsService.createOne({
       ...(versionInput as any),
-      ...(publish ? {
-        publishedOn: new Date().toISOString(),
-      } : {})
+      publishedOn: (publish ? new Date().toISOString() : null)
     });
 
     const quiz = await this.quizzesService.findOne({ versions: { $in: [version] } });

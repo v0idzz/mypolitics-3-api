@@ -6,9 +6,9 @@ export class QuizAxisInput {
   @Field(() => TextTranslationInput, { nullable: true })
   name?: TextTranslationInput;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   left: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   right: string;
 }

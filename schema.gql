@@ -45,8 +45,8 @@ scalar DateTime
 type QuizAxis {
   id: String!
   name: TextTranslation
-  left: Ideology!
-  right: Ideology!
+  left: Ideology
+  right: Ideology
 }
 
 type Party {
@@ -394,8 +394,8 @@ input CreateQuizVersionInput {
 
 input QuizAxisInput {
   name: TextTranslationInput
-  left: String!
-  right: String!
+  left: String
+  right: String
 }
 
 input QuizCompassModeInput {

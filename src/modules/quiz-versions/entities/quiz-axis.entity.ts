@@ -15,11 +15,11 @@ export class QuizAxis {
   name?: TextTranslation;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Ideology' })
-  @Field(() => Ideology)
+  @Field(() => Ideology, { nullable: true })
   left: Ideology;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Ideology' })
-  @Field(() => Ideology)
+  @Field(() => Ideology, { nullable: true })
   right: Ideology;
 }
 

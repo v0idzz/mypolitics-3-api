@@ -25,7 +25,7 @@ class QuizFeatures {
   parties: boolean;
 
   @Prop(mongoose.Schema.Types.Boolean)
-  @Field(() => Boolean)
+  @Field(() => Boolean, { defaultValue: false })
   politiciansResults: boolean;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Party' }] })
