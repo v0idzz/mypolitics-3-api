@@ -1,6 +1,6 @@
 import { ResultsParty } from '../entities/results-party.entity';
 import { ResultsAxis } from '../entities/results-axis.entity';
-import { SurveyAnswerType } from '../../surveys/anums/survey-answer-type.enum';
+import { SurveyAnswerType } from '../../surveys/enums/survey-answer-type.enum';
 import { ResultsIdeology } from '../entities/results-ideology.entity';
 import { Survey } from '../../surveys/entities/survey.entity';
 import { ResultsCompass } from '../entities/results-compass.entity';
@@ -131,26 +131,30 @@ export const getAnswersResults = ({ answers, quizVersion }: Survey): AnswersResu
     });
   });
 
-  const axes = quizVersion.axes.map((axis): ResultsAxis => {
-    const { left, right } = axis;
+  const withoutEmptyOrMisconfiguredAxes = a => !!a?.['_doc'] && !!a?.left?.['_doc'] && !!a?.right?.['_doc'];
 
-    const countMaxPoints = (leftId: string, rightId: string) => (
-      countMaxPointsSingle(leftId) + countMaxPointsSingle(rightId)
-    );
+  const axes = quizVersion.axes
+    .filter(withoutEmptyOrMisconfiguredAxes)
+    .map((axis): ResultsAxis => {
+      const { left, right } = axis;
 
-    return {
-      ...axis['_doc'],
-      left: {
-        ...left['_doc'],
-        points: countPoints(left._id),
-      },
-      right: {
-        ...right['_doc'],
-        points: countPoints(right._id),
-      },
-      maxPoints: countMaxPoints(left._id, right._id),
-    };
-  });
+      const countMaxPoints = (leftId: string, rightId: string) => (
+        countMaxPointsSingle(leftId) + countMaxPointsSingle(rightId)
+      );
+
+      return {
+        ...axis['_doc'],
+        left: {
+          ...left['_doc'],
+          points: countPoints(left._id),
+        },
+        right: {
+          ...right['_doc'],
+          points: countPoints(right._id),
+        },
+        maxPoints: countMaxPoints(left._id, right._id),
+      };
+    });
 
   const parties = Object.values(partiesObj)
     .map(party => {

@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileUpload } from 'graphql-upload';
 import * as Minio from 'minio';
+import { Express } from 'express';
 
 import { IMinioService } from './interfaces/minio-service.interface';
 
 @Injectable()
 export class MinioService implements IMinioService {
   public readonly expiryTime = 60 * 15; // 15 MINUTES
+  public readonly bucketName = 'mypolitics-3';
   private minioClient: Minio.Client;
-  private readonly bucketName = process.env.NODE_ENV === 'production'
-    ? 'mypolitics3'
-    : 'mypolitics3-test';
 
   constructor(
     private readonly configService: ConfigService,
@@ -27,18 +25,20 @@ export class MinioService implements IMinioService {
     }
   }
 
-  public async uploadFileToFilePath(file: FileUpload, filePath: string): Promise<string> {
-    const fileStream = file.createReadStream();
+  public async uploadFileToFilePath(meta: Express.Multer.File, file: Buffer, filePath: string): Promise<string> {
     const metaData = {
-      'Content-Type': file.mimetype,
+      'Content-Type': meta.mimetype,
     };
 
-    return this.minioClient.putObject(
+    await this.minioClient.putObject(
       this.bucketName,
       filePath,
-      fileStream,
+      file,
       metaData,
     );
+
+    const url = await this.minioClient.presignedUrl('GET', this.bucketName, filePath);
+    return url.split('?')[0];
   }
 
   public async deleteFileFromFilePath(filePath: string): Promise<void> {

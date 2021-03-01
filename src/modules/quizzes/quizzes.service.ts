@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class QuizzesService extends BaseService<QuizDocument> {
@@ -23,5 +24,17 @@ export class QuizzesService extends BaseService<QuizDocument> {
   isFeatured(quiz: Quiz): boolean {
     const slugs = this.configService.get<string[]>('quizzes.featuredSlugs');
     return slugs.includes(quiz.slug);
+  }
+
+  async getSlug(): Promise<string> {
+    let slug = nanoid(10);
+    let quizExists = await this.findOneOrNull({ slug });
+
+    while (quizExists) {
+      slug = nanoid(10);
+      quizExists = await this.findOneOrNull({ slug });
+    }
+
+    return slug;
   }
 }

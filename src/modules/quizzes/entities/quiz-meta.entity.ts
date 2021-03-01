@@ -3,7 +3,8 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Party } from '../../parties/entities/party.entity';
 import { QuizLicense } from '../enums/quiz-license.enum';
 import { Types } from 'mongoose';
-import * as mongoose from "mongoose";
+import * as mongoose from 'mongoose';
+import { User } from '../../users/entities/user.entity';
 
 @ObjectType()
 @Schema()
@@ -20,9 +21,8 @@ class QuizFeatures {
   @Field(() => Int)
   questionsNumber?: number;
 
-  @Prop(mongoose.Schema.Types.Boolean)
   @Field(() => Boolean)
-  parties: boolean;
+  parties?: boolean;
 
   @Prop(mongoose.Schema.Types.Boolean)
   @Field(() => Boolean, { defaultValue: false })
@@ -43,18 +43,6 @@ class QuizStatistics {
 
 @ObjectType()
 @Schema()
-class QuizAuthor {
-  @Prop()
-  @Field(() => String)
-  name: string;
-
-  @Prop()
-  @Field(() => String)
-  url: string;
-}
-
-@ObjectType()
-@Schema()
 export class QuizMeta {
   @Prop(raw(QuizFeatures))
   @Field(() => QuizFeatures)
@@ -64,9 +52,9 @@ export class QuizMeta {
   @Field(() => QuizStatistics)
   statistics: QuizStatistics;
 
-  @Prop(raw(QuizAuthor))
-  @Field(() => QuizAuthor)
-  author: QuizAuthor;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
+  @Field(() => [User])
+  authors: User[];
 
   @Prop(mongoose.Schema.Types.String)
   @Field(() => QuizLicense)

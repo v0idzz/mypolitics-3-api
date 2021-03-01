@@ -1,7 +1,7 @@
 import { RemoteGraphQLDataSource } from '@apollo/gateway';
 import { GATEWAY_BUILD_SERVICE } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
-import { Headers } from '../../constants';
+import { Cookies, Headers } from '../../constants';
 
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   willSendRequest({ request, context }) {
@@ -12,6 +12,11 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
     if (context.req.respondent) {
       const respondentData = Buffer.from(JSON.stringify(context.req.respondent)).toString('base64');
       request.http.headers.set(Headers.RESPONDENT, respondentData);
+    }
+
+    if (Object.keys(context.req.cookies).includes(Cookies.JWT)) {
+      const jwt = context.req.cookies[Cookies.JWT];
+      request.http.headers.set(Cookies.JWT, jwt);
     }
 
     const setHeaders = (names: string[]) => (

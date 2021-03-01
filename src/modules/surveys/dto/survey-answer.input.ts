@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Question } from '../../questions/entities/question.entity';
-import { SurveyAnswerType } from '../anums/survey-answer-type.enum';
+import { SurveyAnswerType } from '../enums/survey-answer-type.enum';
 
 @InputType()
 export class SurveyAnswerInput {

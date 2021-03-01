@@ -1,7 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { TextTranslationInput } from '../../../shared/entities/text-translation.entity';
 import { QuizVersion } from '../../quiz-versions/entities/quiz-version.entity';
-import { QuizMetaInput } from './quiz-meta.input';
 
 @InputType()
 export class UpdateQuizInput {
@@ -16,7 +15,4 @@ export class UpdateQuizInput {
 
   @Field(() => String, { nullable: true })
   currentVersion?: QuizVersion;
-
-  @Field(() => QuizMetaInput, { nullable: true })
-  meta?: QuizMetaInput;
 }

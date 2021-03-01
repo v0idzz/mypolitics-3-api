@@ -11,6 +11,7 @@ import Cookies from 'cookies';
 import { Cookies as ConstCookies } from '../../constants';
 import dayjs from 'dayjs';
 import { AdminGuard } from '../../shared/guards/admin.guard';
+import { GqlAuthGuard } from '../../shared/guards/gql-auth.guard';
 
 @Resolver(() => Respondent)
 export class RespondentsResolver {
@@ -72,7 +73,7 @@ export class RespondentsResolver {
   }
 
   @Query(() => Boolean)
-  @UseGuards(AdminGuard)
+  @UseGuards(GqlAuthGuard, AdminGuard)
   verifyAdmin() {
     return true;
   }

@@ -3,15 +3,18 @@ import { QuestionsService } from './questions.service';
 import { Question } from './entities/question.entity';
 import { CreateQuestionInput } from './dto/create-question.input';
 import { UpdateQuestionInput } from './dto/update-question.input';
-import { UseGuards } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AdminGuard } from '../../shared/guards/admin.guard';
 import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
 import { AddPartyAnswersInput } from './dto/add-party-answers-input';
-import { SurveyAnswerType } from '../surveys/anums/survey-answer-type.enum';
+import { SurveyAnswerType } from '../surveys/enums/survey-answer-type.enum';
 import { PartiesService } from '../parties/parties.service';
+import { GqlAuthGuard } from '../../shared/guards/gql-auth.guard';
+import { CurrentUser } from '../../shared/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Resolver(() => Question)
-@UseGuards(AdminGuard)
+@UseGuards(GqlAuthGuard)
 export class QuestionsResolver {
   constructor(
     private readonly questionsService: QuestionsService,
@@ -21,20 +24,25 @@ export class QuestionsResolver {
 
   @Mutation(() => Question)
   async createQuestion(
-    @Args({ name: 'quizVersion', type: () => String }) quizVersion: string,
     @Args('createQuestionInput') createQuestionInput: CreateQuestionInput,
+    @CurrentUser() user: User,
   ): Promise<Question> {
-    return await this.questionsService.createOne(createQuestionInput);
+    return await this.questionsService.createOne({
+      ...createQuestionInput,
+      authors: [user]
+    });
   }
 
+  @UseGuards(AdminGuard)
   @Mutation(() => [Question])
   async createManyQuestions(
+    @CurrentUser() user: User,
     @Args({ name: 'quizVersion', type: () => String }) quizVersion: string,
     @Args({ name: 'createManyQuestionsInput', type: () => [CreateQuestionInput] })
       createManyQuestionsInput: CreateQuestionInput[],
   ) {
     const questions = await Promise.all(
-      createManyQuestionsInput.map(q => this.questionsService.createOne(q))
+      createManyQuestionsInput.map(q => this.questionsService.createOne({ ...q, authors: [user] }))
     );
 
     await this.quizVersionsService.updateOne({
@@ -50,7 +58,15 @@ export class QuestionsResolver {
   async updateQuestion(
     @Args({ name: 'id', type: () => String }) _id: string,
     @Args('updateQuestionInput') updateQuestionInput: UpdateQuestionInput,
+    @CurrentUser() user: User
   ): Promise<Question> {
+    const question = await this.questionsService.findOne({ _id });
+    const hasPermission = user.isAdmin() || question.isAuthor(user);
+
+    if (!hasPermission) {
+      throw new UnauthorizedException();
+    }
+
     return this.questionsService.updateOne({ _id }, updateQuestionInput, {
       populate: {
         path: 'effects',
@@ -104,7 +120,7 @@ export class QuestionsResolver {
             }
           });
         } catch (e) {
-          // console.error(e);
+          console.error(e);
         }
       }
     }

@@ -15,11 +15,11 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
   },
   [ErrorCode.SURVEY_FINISHED]: {
     code: ErrorCode.SURVEY_FINISHED,
-    text: 'Survey has been finished',
+    text: 'User has been finished',
   },
   [ErrorCode.SURVEY_NOT_FINISHED]: {
     code: ErrorCode.SURVEY_NOT_FINISHED,
-    text: 'Survey has not been finished yet',
+    text: 'User has not been finished yet',
   },
   [ErrorCode.QUIZ_VERSION_PUBLISHED]: {
     code: ErrorCode.QUIZ_VERSION_PUBLISHED,
@@ -29,6 +29,7 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
 
 export const Cookies = {
   RESPONDENT: 'mypolitics-respondent',
+  JWT: 'jwt',
 };
 
 export const Headers = {

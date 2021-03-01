@@ -21,6 +21,9 @@ import { ResultsModule } from './modules/results/results.module';
 import { BuildServiceModule } from './modules/build-service/build-service.module';
 import { RespondentsService } from './modules/respondents/respondents.service';
 import { Respondent, RespondentSchema } from './modules/respondents/entities/respondent.entity';
+import { UploadModule } from './modules/upload/upload.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -71,6 +74,9 @@ import { Respondent, RespondentSchema } from './modules/respondents/entities/res
     PartiesModule,
     QuestionsModule,
     ResultsModule,
+    UploadModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [RespondentsService, Logger],

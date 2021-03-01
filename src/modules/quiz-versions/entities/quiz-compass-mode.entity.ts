@@ -7,7 +7,7 @@ import { QuizCompassAxis } from './quiz-compass-axis.entity';
 @Schema()
 export class QuizCompassMode {
   @Prop(raw(TextTranslation))
-  @Field(() => TextTranslation)
+  @Field(() => TextTranslation, { nullable: true })
   name: TextTranslation;
 
   @Prop(raw(QuizCompassAxis))

@@ -13,7 +13,7 @@ export class QuizCompassIdeologyInput {
 
 @InputType()
 export class QuizCompassAxisInput {
-  @Field(() => TextTranslationInput)
+  @Field(() => TextTranslationInput, { nullable: true })
   name?: TextTranslationInput;
 
   @Field(() => [QuizCompassIdeologyInput])

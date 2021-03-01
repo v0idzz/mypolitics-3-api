@@ -1,7 +1,7 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Headers } from '../../constants';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { UserRole } from '../../modules/users/enums/user-role';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -9,6 +9,6 @@ export class AdminGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const { req } = GqlExecutionContext.create(context).getContext();
-    return req.headers[Headers.ADMIN] === process.env.ADMIN_CODE;
+    return req.user && req.user.role === UserRole.ADMIN;
   }
 }

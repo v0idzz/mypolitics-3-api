@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { forwardRef, Logger, Module } from '@nestjs/common';
 import { QuizVersionsService } from './quiz-versions.service';
 import { QuizVersionsResolver } from './quiz-versions.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,7 +15,7 @@ import { Quiz, QuizSchema } from '../quizzes/entities/quiz.entity';
       { name: QuizAxis.name, schema: QuizAxisSchema },
       { name: Quiz.name, schema: QuizSchema },
     ], 'main'),
-    QuizzesModule,
+    forwardRef(() => QuizzesModule),
   ],
   providers: [QuizzesService, QuizVersionsResolver, QuizVersionsService, Logger]
 })

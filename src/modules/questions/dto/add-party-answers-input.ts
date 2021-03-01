@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { TextTranslationInput } from '../../../shared/entities/text-translation.entity';
-import { SurveyAnswerType } from '../../surveys/anums/survey-answer-type.enum';
+import { SurveyAnswerType } from '../../surveys/enums/survey-answer-type.enum';
 
 @InputType()
 export class AddPartyAnswersInput {

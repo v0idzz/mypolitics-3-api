@@ -164,6 +164,7 @@ export const calcParties = (
       createdAt: new Date().toISOString(),
       country: Country.POLAND,
       percentAgreement: parseInt(value.toFixed(0), 10),
+      authors: [],
     };
   });
 

@@ -3,27 +3,55 @@ import { QuizzesService } from './quizzes.service';
 import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { CreateQuizInput } from './dto/create-quiz.input';
 import { UpdateQuizInput } from './dto/update-quiz.input';
-import { UseGuards } from '@nestjs/common';
-import { AdminGuard } from '../../shared/guards/admin.guard';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { QuizMeta } from './entities/quiz-meta.entity';
 import { QuizType } from './enums/quiz-type.enum';
 import { QuizVersion } from '../quiz-versions/entities/quiz-version.entity';
+import { GqlAuthGuard } from '../../shared/guards/gql-auth.guard';
+import { QuizLicense } from './enums/quiz-license.enum';
+import { CurrentUser } from '../../shared/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
+import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
   constructor(
     private readonly quizzesService: QuizzesService,
+    private readonly quizVersionsService: QuizVersionsService,
   ) {}
 
   @Mutation(() => Quiz)
-  @UseGuards(AdminGuard)
+  @UseGuards(GqlAuthGuard)
   async createQuiz(
     @Args('createQuizInput') createQuizInput: CreateQuizInput,
+    @CurrentUser() user: User
   ) {
+    const slug = await this.quizzesService.getSlug();
+    const currentVersion = await this.quizVersionsService.createOne({
+      axes: [],
+      questions: [],
+      compassModes: [],
+      traits: [],
+      ideologies: [],
+      parties: []
+    });
+
     return this.quizzesService.createOne({
       ...createQuizInput,
-      currentVersion: null,
-      versions: [],
+      slug,
+      currentVersion,
+      versions: [currentVersion],
+      meta: {
+        license: QuizLicense.MIT,
+        authors: [user],
+        statistics: {
+          surveysNumber: 0,
+        },
+        features: {
+          authorizedParties: [],
+          politiciansResults: false,
+        },
+      }
     });
   }
 
@@ -31,7 +59,11 @@ export class QuizzesResolver {
   async findOne(
     @Args('slug', { type: () => String }) slug: string,
   ): Promise<Quiz> {
-    return this.quizzesService.findOne({ slug }, {}, {
+    const idRegex = /^[a-f\d]{24}$/;
+    const slugIsId = !!slug.match(idRegex);
+    const conditions = slugIsId ? { _id: slug } : { slug };
+
+    return this.quizzesService.findOne(conditions, {}, {
       populate: {
         path: 'versions currentVersion lastUpdatedVersion',
         populate: {
@@ -47,11 +79,19 @@ export class QuizzesResolver {
   }
 
   @Mutation(() => Quiz)
-  @UseGuards(AdminGuard)
+  @UseGuards(GqlAuthGuard)
   async updateQuiz(
     @Args({ name: 'id', type: () => String }) _id: string,
     @Args('updateQuizInput') updateQuizInput: UpdateQuizInput,
+    @CurrentUser() user: User
   ): Promise<Quiz> {
+    const quiz = await this.quizzesService.findOne({ _id });
+    const hasPermission = user.isAdmin() || quiz.isAuthor(user);
+
+    if (!hasPermission) {
+      throw new UnauthorizedException();
+    }
+
     return this.quizzesService.updateOne({ _id }, updateQuizInput);
   }
 

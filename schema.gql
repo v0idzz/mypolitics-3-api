@@ -27,6 +27,25 @@ type IdeologyIcon {
   value: String!
 }
 
+type User {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  email: String!
+  name: String!
+  role: UserRole!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum UserRole {
+  REGULAR
+  ADMIN
+}
+
 type Ideology {
   id: String!
   createdAt: DateTime!
@@ -35,12 +54,9 @@ type Ideology {
   description: TextTranslation!
   color: String!
   icon: IdeologyIcon!
+  viewerCanEdit: Boolean!
+  authors: [User!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type QuizAxis {
   id: String!
@@ -56,6 +72,8 @@ type Party {
   name: String!
   logoUrl: String!
   country: Country!
+  authors: [User!]!
+  viewerCanEdit: Boolean!
 }
 
 enum Country {
@@ -80,6 +98,7 @@ type Question {
   updatedAt: DateTime!
   text: TextTranslation!
   effects: QuestionEffects!
+  authors: [User!]!
 }
 
 type QuizCompassIdeology {
@@ -94,7 +113,7 @@ type QuizCompassAxis {
 }
 
 type QuizCompassMode {
-  name: TextTranslation!
+  name: TextTranslation
   horizontal: QuizCompassAxis!
   vertical: QuizCompassAxis!
   third: QuizCompassAxis
@@ -162,15 +181,10 @@ type QuizStatistics {
   surveysNumber: Int!
 }
 
-type QuizAuthor {
-  name: String!
-  url: String!
-}
-
 type QuizMeta {
   features: QuizFeatures!
   statistics: QuizStatistics!
-  author: QuizAuthor!
+  authors: [User!]!
   license: QuizLicense!
 }
 
@@ -207,6 +221,8 @@ type ResultsParty {
   name: String!
   logoUrl: String!
   country: Country!
+  authors: [User!]!
+  viewerCanEdit: Boolean!
   agreementPoints: Int!
   disagreementPoints: Int!
   percentAgreement: Int!
@@ -220,6 +236,8 @@ type ResultsIdeology {
   description: TextTranslation!
   color: String!
   icon: IdeologyIcon!
+  viewerCanEdit: Boolean!
+  authors: [User!]!
   points: Int!
   maxPoints: Int!
 }
@@ -238,7 +256,7 @@ type ResultsCompassPoint {
 }
 
 type ResultsCompass {
-  name: TextTranslation!
+  name: TextTranslation
   horizontal: QuizCompassAxis!
   vertical: QuizCompassAxis!
   third: QuizCompassAxis
@@ -265,6 +283,7 @@ type Query {
   featuredQuizzes: [Quiz!]!
   quizVersion(id: String!): QuizVersion!
   results(surveyId: String!): Results!
+  me: User!
 }
 
 type Mutation {
@@ -277,14 +296,14 @@ type Mutation {
   deleteSurvey(id: String!): Boolean!
   createQuiz(createQuizInput: CreateQuizInput!): Quiz!
   updateQuiz(updateQuizInput: UpdateQuizInput!, id: String!): Quiz!
-  createIdeology(createIdeologyInput: CreateIdeologyInput!): Ideology!
-  updateIdeology(updateIdeologyInput: UpdateIdeologyInput!, id: String!): Ideology!
   createQuizVersion(createQuizVersionInput: CreateQuizVersionInput!, quizId: String!): QuizVersion!
   saveQuizVersion(saveQuizVersionInput: UpdateQuizVersionInput!, publish: Boolean!, id: String!): QuizVersion!
   updateQuizVersion(updateQuizVersionInput: UpdateQuizVersionInput!, id: String!): QuizVersion!
+  createIdeology(createIdeologyInput: CreateIdeologyInput!): Ideology!
+  updateIdeology(updateIdeologyInput: UpdateIdeologyInput!, id: String!): Ideology!
   createParty(createPartyInput: CreatePartyInput!): Party!
   updateParty(updatePartyInput: UpdatePartyInput!, id: String!): Party!
-  createQuestion(createQuestionInput: CreateQuestionInput!, quizVersion: String!): Question!
+  createQuestion(createQuestionInput: CreateQuestionInput!): Question!
   createManyQuestions(createManyQuestionsInput: [CreateQuestionInput!]!, quizVersion: String!): [Question!]!
   updateQuestion(updateQuestionInput: UpdateQuestionInput!, id: String!): Question!
   addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, quizVersionId: String!, partyId: String!): Boolean!
@@ -324,11 +343,9 @@ input SurveyAnswerInput {
 }
 
 input CreateQuizInput {
-  slug: String!
   logoUrl: String!
   title: TextTranslationInput!
   description: TextTranslationInput!
-  meta: QuizMetaInput!
 }
 
 input TextTranslationInput {
@@ -336,53 +353,11 @@ input TextTranslationInput {
   en: String
 }
 
-input QuizMetaInput {
-  features: QuizFeaturesInput!
-  statistics: QuizStatisticsInput!
-  author: QuizAuthorInput!
-  license: QuizLicense!
-}
-
-input QuizFeaturesInput {
-  authorizedParties: [String!]!
-  parties: Boolean!
-  politiciansResults: Boolean!
-}
-
-input QuizStatisticsInput {
-  surveysNumber: Int!
-}
-
-input QuizAuthorInput {
-  name: String!
-  url: String!
-}
-
 input UpdateQuizInput {
   title: TextTranslationInput
   logoUrl: String
   description: TextTranslationInput
   currentVersion: String
-  meta: QuizMetaInput
-}
-
-input CreateIdeologyInput {
-  name: TextTranslationInput!
-  description: TextTranslationInput!
-  color: String!
-  icon: IdeologyIconInput!
-}
-
-input IdeologyIconInput {
-  type: String!
-  value: String!
-}
-
-input UpdateIdeologyInput {
-  name: TextTranslationInput!
-  description: TextTranslationInput!
-  color: String!
-  icon: IdeologyIconInput!
 }
 
 input CreateQuizVersionInput {
@@ -406,7 +381,7 @@ input QuizCompassModeInput {
 }
 
 input QuizCompassAxisInput {
-  name: TextTranslationInput!
+  name: TextTranslationInput
   leftIdeologies: [QuizCompassIdeologyInput!]!
   rightIdeologies: [QuizCompassIdeologyInput!]!
 }
@@ -425,6 +400,25 @@ input UpdateQuizVersionInput {
   questions: [String]!
   ideologies: [String]!
   parties: [String]!
+}
+
+input CreateIdeologyInput {
+  name: TextTranslationInput!
+  description: TextTranslationInput!
+  color: String!
+  icon: IdeologyIconInput!
+}
+
+input IdeologyIconInput {
+  type: String!
+  value: String!
+}
+
+input UpdateIdeologyInput {
+  name: TextTranslationInput!
+  description: TextTranslationInput!
+  color: String!
+  icon: IdeologyIconInput!
 }
 
 input CreatePartyInput {
