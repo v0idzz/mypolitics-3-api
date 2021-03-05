@@ -2,11 +2,10 @@ import { Logger, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLGatewayModule, GraphQLFederationModule, GATEWAY_BUILD_SERVICE } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 
 import { MinioModule } from './modules/minio/minio.module';
-import graphqlConfig from './config/graphql.config';
-import graphqlGatewayConfig from './config/graphql-gateway.config';
-import mongooseConfig from './config/mongoose.config';
 import { PubSubModule } from './modules/pubsub/pubsub.module';
 import { RespondentsModule } from './modules/respondents/respondents.module';
 import { SurveysModule } from './modules/surveys/surveys.module';
@@ -24,6 +23,12 @@ import { Respondent, RespondentSchema } from './modules/respondents/entities/res
 import { UploadModule } from './modules/upload/upload.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+
+import graphqlConfig from './config/graphql.config';
+import graphqlGatewayConfig from './config/graphql-gateway.config';
+import mongooseConfig from './config/mongoose.config';
+import mailConfig from './config/mail.config';
+import { UtilsModule } from './modules/utils/utils.module';
 
 @Module({
   imports: [
@@ -63,6 +68,23 @@ import { UsersModule } from './modules/users/users.module';
       connectionName: 'classic',
       inject: [ConfigService],
     }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule.forFeature(mailConfig)],
+      useFactory: async (configService: ConfigService) => ({
+        transport: configService.get('mail.transport'),
+        defaults: {
+          from:'"myPolitics" <no-reply@mypolitics.pl>',
+        },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new PugAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
     ConfigModule.forRoot(),
     MinioModule,
     PubSubModule,
@@ -77,6 +99,7 @@ import { UsersModule } from './modules/users/users.module';
     UploadModule,
     AuthModule,
     UsersModule,
+    UtilsModule,
   ],
   controllers: [],
   providers: [RespondentsService, Logger],

@@ -1,0 +1,139 @@
+style.
+    * {
+        margin: 0;
+        padding: 0;
+        font-size: 100%;
+        font-family: 'Avenir Next', "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+        line-height: 1.65;
+    }
+    img {
+        max-width: 100%;
+        margin: 0 auto;
+        display: block;
+    }
+    body,
+    .body-wrap {
+        width: 100% !important;
+        height: 100%;
+        background: #F9FBFB;
+    }
+    a {
+        color: #00B3DB;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .text-right {
+        text-align: right;
+    }
+    .text-left {
+        text-align: left;
+    }
+    .button {
+        display: inline-block;
+        color: white;
+        background: #00B3DB;
+        border: solid #00B3DB;
+        border-width: 10px 20px 8px;
+        font-weight: bold;
+        border-radius: 4px;
+    }
+    .button:hover {
+        text-decoration: none;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-bottom: 20px;
+        line-height: 1.25;
+    }
+    h1 {
+        font-size: 32px;
+    }
+    h2 {
+        font-size: 28px;
+    }
+    h3 {
+        font-size: 24px;
+    }
+    h4 {
+        font-size: 20px;
+    }
+    h5 {
+        font-size: 16px;
+    }
+    p,
+    ul,
+    ol {
+        font-size: 16px;
+        font-weight: normal;
+        margin-bottom: 20px;
+    }
+    .container {
+        display: block !important;
+        clear: both !important;
+        margin: 0 auto !important;
+        max-width: 580px !important;
+    }
+    .container table {
+        width: 100% !important;
+        border-collapse: collapse;
+    }
+    .container .content {
+        background: white;
+        padding: 30px 35px;
+    }
+    .container .content.footer {
+        background: none;
+    }
+    .container .content.footer p {
+        margin-bottom: 0;
+        color: #888;
+        text-align: center;
+        font-size: 14px;
+    }
+    .container .content.footer a {
+        color: #888;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .container .content.footer a:hover {
+        text-decoration: underline;
+    }
+table.body-wrap
+    tr
+        td.container
+            table
+                tr
+                    img.masthead(align='center', src='https://files.mypolitics.pl/mypolitics2/cdnv2-medium_myp3_bg_min_1_a3cd8773f1.png')
+                tr
+                    td.content
+                        h2 Hello #{name},
+                        p
+                            | Please confirm your email address by clicking the link below. We'll communicate important updates with you from time to time via email, so it's essential that we have an up-to-date email address on file.
+
+
+                        table
+                            tr
+                                td(align='center')
+                                    p
+                                        a.button(href='https://mypolitics.pl/api/auth/verify?userId=' + userId + '&code=' + code) Verify email
+    tr
+        td.container
+            table
+                tr
+                    td.content.footer(align='center')
+                        p
+                            | Sent by&nbsp;
+                            a(href='https://mypolitics.pl') myPolitics
+                            |  | #SharePoliticalAwareness
+                        p
+                            | Questions? Get in touch:&nbsp;
+                            a(href='mailto:biuro@mypolitics.pl') biuro@mypolitics.pl

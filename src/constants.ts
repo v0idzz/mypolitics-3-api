@@ -24,12 +24,28 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
   [ErrorCode.QUIZ_VERSION_PUBLISHED]: {
     code: ErrorCode.QUIZ_VERSION_PUBLISHED,
     text: 'Quiz version has been published',
-  }
+  },
+  [ErrorCode.WRONG_CREDENTIALS]: {
+    code: ErrorCode.WRONG_CREDENTIALS,
+    text: 'Wrong credentials',
+  },
+  [ErrorCode.USER_EXISTS]: {
+    code: ErrorCode.USER_EXISTS,
+    text: 'User exists',
+  },
+  [ErrorCode.EMAIL_NOT_VERIFIED]: {
+    code: ErrorCode.EMAIL_NOT_VERIFIED,
+    text: 'Email not verified',
+  },
+  [ErrorCode.USER_NOT_EXISTS]: {
+    code: ErrorCode.USER_NOT_EXISTS,
+    text: 'User not exists',
+  },
 };
 
 export const Cookies = {
   RESPONDENT: 'mypolitics-respondent',
-  JWT: 'jwt',
+  JWT: 'mypolitics-jwt',
 };
 
 export const Headers = {

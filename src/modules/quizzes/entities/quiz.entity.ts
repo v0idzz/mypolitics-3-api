@@ -8,6 +8,7 @@ import * as mongoose from 'mongoose';
 import { QuizMeta } from './quiz-meta.entity';
 import { QuizType } from '../enums/quiz-type.enum';
 import { User } from '../../users/entities/user.entity';
+import { QuizVerifyRequest } from './quiz-verify-request.entity';
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -34,6 +35,10 @@ export class Quiz extends BaseEntity {
   @Prop(raw(QuizMeta))
   @Field(() => QuizMeta)
   meta: QuizMeta;
+
+  @Prop(raw(QuizVerifyRequest))
+  @Field(() => QuizVerifyRequest, { nullable: true })
+  verifyRequest?: QuizVerifyRequest;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'QuizVersion' })
   @Field(() => QuizVersion)

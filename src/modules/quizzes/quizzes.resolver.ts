@@ -12,6 +12,9 @@ import { QuizLicense } from './enums/quiz-license.enum';
 import { CurrentUser } from '../../shared/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
+import { QuizVerificationState } from './enums/quiz-verification-state.enum';
+import { UserRole } from '../users/enums/user-role';
+import { VerifyQuizInput } from './dto/verify-quiz.input';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
@@ -78,6 +81,21 @@ export class QuizzesResolver {
     return this.quizzesService.getFeaturedQuizzes();
   }
 
+  @UseGuards(GqlAuthGuard)
+  @Query(() => [Quiz], { name: 'verifyQueueQuizzes' })
+  async findVerifyQueue(
+    @CurrentUser() user: User
+  ): Promise<Quiz[]> {
+    const isModerator = [UserRole.ADMIN, UserRole.MODERATOR].includes(user.role);
+    if (!isModerator) {
+      throw new UnauthorizedException();
+    }
+
+    return this.quizzesService.findMany({
+      'verifyRequest.state': QuizVerificationState.IDLE,
+    });
+  }
+
   @Mutation(() => Quiz)
   @UseGuards(GqlAuthGuard)
   async updateQuiz(
@@ -93,6 +111,53 @@ export class QuizzesResolver {
     }
 
     return this.quizzesService.updateOne({ _id }, updateQuizInput);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async requestQuizVerify(
+    @Args({ name: 'id', type: () => String }) _id: string,
+    @CurrentUser() user: User
+  ): Promise<boolean> {
+    const quiz = await this.quizzesService.findOne({ _id });
+
+    if (!quiz.isAuthor(user)) {
+      throw new UnauthorizedException();
+    }
+
+    await quiz.updateOne({
+      verifyRequest: {
+        version: quiz.lastUpdatedVersion,
+        state: QuizVerificationState.IDLE
+      }
+    });
+
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async verifyQuiz(
+    @Args({ name: 'id', type: () => String }) _id: string,
+    @Args('verifyQuizInput') verifyQuizInput: VerifyQuizInput,
+    @CurrentUser() user: User
+  ): Promise<boolean> {
+    const isModerator = [UserRole.ADMIN, UserRole.MODERATOR].includes(user.role);
+    if (!isModerator) {
+      throw new UnauthorizedException();
+    }
+
+    const quiz = await this.quizzesService.findOne({ _id });
+
+    await quiz.updateOne({
+      verifyRequest: {
+        version: quiz.verifyRequest.version,
+        moderator: user,
+        ...verifyQuizInput
+      }
+    });
+
+    return true;
   }
 
   @ResolveField()

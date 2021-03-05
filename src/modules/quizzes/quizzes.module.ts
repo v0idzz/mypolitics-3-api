@@ -9,6 +9,7 @@ import quizzesConfig from '../../config/quizzes.config';
 import { QuizVersion, QuizVersionSchema } from '../quiz-versions/entities/quiz-version.entity';
 import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
 import { QuizVersionsModule } from '../quiz-versions/quiz-versions.module';
+import { QuizVerifyRequest, QuizVerifyRequestSchema } from './entities/quiz-verify-request.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { QuizVersionsModule } from '../quiz-versions/quiz-versions.module';
       { name: Quiz.name, schema: QuizSchema },
       { name: QuizMeta.name, schema: QuizMetaSchema },
       { name: QuizVersion.name, schema: QuizVersionSchema },
+      { name: QuizVerifyRequest.name, schema: QuizVerifyRequestSchema },
     ], 'main'),
   ],
   providers: [ConfigService, QuizzesResolver, QuizVersionsService, QuizzesService, Logger],

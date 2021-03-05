@@ -32,6 +32,7 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
   email: String!
+  emailVerified: Boolean!
   name: String!
   role: UserRole!
 }
@@ -44,6 +45,7 @@ scalar DateTime
 enum UserRole {
   REGULAR
   ADMIN
+  MODERATOR
 }
 
 type Ideology {
@@ -193,6 +195,19 @@ enum QuizLicense {
   MIT
 }
 
+type QuizVerifyRequest {
+  version: QuizVersion!
+  moderator: User
+  reason: String
+  state: QuizVerificationState!
+}
+
+enum QuizVerificationState {
+  IDLE
+  ACCEPTED
+  DECLINED
+}
+
 type Quiz {
   id: String!
   createdAt: DateTime!
@@ -203,6 +218,7 @@ type Quiz {
   title: TextTranslation!
   description: TextTranslation!
   meta: QuizMeta!
+  verifyRequest: QuizVerifyRequest
   currentVersion: QuizVersion!
   lastUpdatedVersion: QuizVersion!
   versions: [QuizVersion]!
@@ -281,6 +297,7 @@ type Query {
   survey(id: String!): Survey!
   quiz(slug: String!): Quiz!
   featuredQuizzes: [Quiz!]!
+  verifyQueueQuizzes: [Quiz!]!
   quizVersion(id: String!): QuizVersion!
   results(surveyId: String!): Results!
   me: User!
@@ -296,6 +313,8 @@ type Mutation {
   deleteSurvey(id: String!): Boolean!
   createQuiz(createQuizInput: CreateQuizInput!): Quiz!
   updateQuiz(updateQuizInput: UpdateQuizInput!, id: String!): Quiz!
+  requestQuizVerify(id: String!): Boolean!
+  verifyQuiz(verifyQuizInput: VerifyQuizInput!, id: String!): Boolean!
   createQuizVersion(createQuizVersionInput: CreateQuizVersionInput!, quizId: String!): QuizVersion!
   saveQuizVersion(saveQuizVersionInput: UpdateQuizVersionInput!, publish: Boolean!, id: String!): QuizVersion!
   updateQuizVersion(updateQuizVersionInput: UpdateQuizVersionInput!, id: String!): QuizVersion!
@@ -307,6 +326,10 @@ type Mutation {
   createManyQuestions(createManyQuestionsInput: [CreateQuestionInput!]!, quizVersion: String!): [Question!]!
   updateQuestion(updateQuestionInput: UpdateQuestionInput!, id: String!): Question!
   addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, quizVersionId: String!, partyId: String!): Boolean!
+  createUser(createUserInput: CreateUserInput!): User!
+  resendEmail(recaptcha: String!, email: String!): User!
+  loginUser(loginUserInput: LoginUserInput!): User!
+  logoutMe: Boolean!
 }
 
 input CreateRespondentInput {
@@ -358,6 +381,11 @@ input UpdateQuizInput {
   logoUrl: String
   description: TextTranslationInput
   currentVersion: String
+}
+
+input VerifyQuizInput {
+  state: QuizVerificationState!
+  reason: String!
 }
 
 input CreateQuizVersionInput {
@@ -456,4 +484,17 @@ input UpdateQuestionInput {
 input AddPartyAnswersInput {
   questionText: TextTranslationInput!
   answer: SurveyAnswerType!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+  recaptcha: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+  recaptcha: String!
 }

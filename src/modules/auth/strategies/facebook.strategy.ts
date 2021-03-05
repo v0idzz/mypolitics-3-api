@@ -23,7 +23,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-  ): Promise<any> {
+  ): Promise<User> {
     const { name, emails } = profile;
     const email = emails[0].value;
 
@@ -33,6 +33,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       const userData: User = {
         name: `${name.givenName} ${name.familyName}`,
         role: UserRole.REGULAR,
+        emailVerified: true,
         email,
       };
 

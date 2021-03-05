@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, HttpStatus, Req, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, HttpStatus, Req, Res, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import Cookies from 'cookies';
@@ -28,9 +28,25 @@ export class AuthController {
     const cookies = new Cookies(req, res);
     const token = await this.authService.createAndGetAccessToken(req.user as User);
     cookies.set(ConstCookies.JWT, token, {
+      httpOnly: true,
       expires: dayjs().add(7, 'day').toDate(),
     });
 
     res.redirect('/');
+  }
+
+  @Get('verify')
+  async verifyUser(
+    @Res() res: Response,
+    @Query() { code, userId }: {
+      code: string;
+      userId: string;
+    }
+  ): Promise<any> {
+    const verified = this.authService.verifyActionToken(code, userId);
+
+    if (verified) {
+      res.redirect('/');
+    }
   }
 }
