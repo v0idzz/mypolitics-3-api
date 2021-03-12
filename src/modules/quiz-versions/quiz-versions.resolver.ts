@@ -11,6 +11,9 @@ import { Quiz } from '../quizzes/entities/quiz.entity';
 import { quizVersionToInput } from './utils/quiz-version-to-input';
 import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
+import { GqlAuthGuard } from '../../shared/guards/gql-auth.guard';
+import { CurrentUser } from '../../shared/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Resolver(() => QuizVersion)
 export class QuizVersionsResolver {
@@ -53,13 +56,19 @@ export class QuizVersionsResolver {
   }
 
   @Mutation(() => QuizVersion)
-  @UseGuards(AdminGuard)
+  @UseGuards(GqlAuthGuard)
   async saveQuizVersion(
     @Args({ name: 'id', type: () => String }) _id: string,
     @Args({ name: 'publish', type: () => Boolean }) publish: boolean,
     @Args('saveQuizVersionInput') saveQuizVersionInput: UpdateQuizVersionInput,
+    @CurrentUser() user: User,
   ): Promise<QuizVersion> {
     const version = await this.quizVersionsService.findOne({ _id });
+    const quiz = await this.quizzesService.findOne({ versions: { $in: [version] } });
+    if (!quiz.isAuthor(user)) {
+      throw new UnauthorizedException(ErrorsMessages[ErrorCode.NOT_AUTHORIZED]);
+    }
+
     const versionInput = quizVersionToInput(version);
     observableDiff(versionInput, saveQuizVersionInput, function (d) {
       applyChange(versionInput, saveQuizVersionInput, d);
@@ -69,8 +78,6 @@ export class QuizVersionsResolver {
       ...(versionInput as any),
       publishedOn: (publish ? new Date().toISOString() : null)
     });
-
-    const quiz = await this.quizzesService.findOne({ versions: { $in: [version] } });
 
     await this.quizzesService.updateOne({
       _id: quiz._id,
@@ -83,12 +90,17 @@ export class QuizVersionsResolver {
   }
 
   @Mutation(() => QuizVersion)
-  @UseGuards(AdminGuard)
+  @UseGuards(GqlAuthGuard)
   async updateQuizVersion(
     @Args({ name: 'id', type: () => String }) _id: string,
     @Args('updateQuizVersionInput') updateQuizVersionInput: UpdateQuizVersionInput,
+    @CurrentUser() user: User,
   ): Promise<QuizVersion> {
     const quizVersion = await this.quizVersionsService.findOne({ _id });
+    const quiz = await this.quizzesService.findOne({ versions: { $in: [quizVersion] } });
+    if (!quiz.isAuthor(user)) {
+      throw new UnauthorizedException(ErrorsMessages[ErrorCode.NOT_AUTHORIZED]);
+    }
 
     if (!!quizVersion.publishedOn) {
       throw new UnauthorizedException(ErrorsMessages[ErrorCode.QUIZ_VERSION_PUBLISHED]);

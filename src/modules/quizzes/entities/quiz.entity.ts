@@ -36,7 +36,10 @@ export class Quiz extends BaseEntity {
   @Field(() => QuizMeta)
   meta: QuizMeta;
 
-  @Prop(raw(QuizVerifyRequest))
+  @Prop({
+    type: raw(QuizVerifyRequest),
+    default: null,
+  })
   @Field(() => QuizVerifyRequest, { nullable: true })
   verifyRequest?: QuizVerifyRequest;
 

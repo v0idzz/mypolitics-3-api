@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 import { BaseEntity } from '../../../shared/base/base.entity';
 import { UserRole } from '../enums/user-role';
 import * as bcrypt from 'bcrypt';
-import * as mongoose from "mongoose";
+import * as mongoose from 'mongoose';
 
 @ObjectType()
 @Schema({ timestamps: true })

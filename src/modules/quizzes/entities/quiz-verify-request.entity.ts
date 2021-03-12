@@ -26,7 +26,7 @@ export class QuizVerifyRequest {
   @Prop({
     enum: QuizVerificationState
   })
-  @Field(() => QuizVerificationState)
+  @Field(() => QuizVerificationState, { defaultValue: QuizVerificationState.ACCEPTED })
   state: QuizVerificationState;
 }
 

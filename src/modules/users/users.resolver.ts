@@ -13,6 +13,7 @@ import { Cookies, ErrorsMessages } from '../../constants';
 import * as bcrypt from 'bcrypt';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { ActionTokenType } from '../auth/enums/action-token-type.enum';
+import dayjs from 'dayjs';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -56,31 +57,6 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  async resendEmail(
-    @Args('email') email: string,
-    @Args('recaptcha') recaptcha: string,
-  ): Promise<User> {
-    const captchaValid = await this.authService.validateReCaptcha(recaptcha);
-    if (!captchaValid) {
-      throw new BadRequestException();
-    }
-
-    const user = await this.usersService.findOne({ email });
-    if (!user) {
-      throw new BadRequestException(ErrorsMessages[ErrorCode.USER_EXISTS]);
-    }
-
-    if (user.emailVerified) {
-      throw new BadRequestException();
-    }
-
-    const token = await this.authService.createAndGetActionToken(user, ActionTokenType.VERIFY_EMAIL);
-    await this.authService.sendEmailConfirm(user, token);
-
-    return user;
-  }
-
-  @Mutation(() => User)
   async loginUser(
     @Args('loginUserInput') { recaptcha, email, password }: LoginUserInput,
     @Context() { res }: ExpressContext
@@ -91,18 +67,39 @@ export class UsersResolver {
     }
 
     const user = await this.usersService.findOne({ email });
-    const validCredentials = await user.compareHash(password);
+    if (!user) {
+      throw new BadRequestException(ErrorsMessages[ErrorCode.WRONG_CREDENTIALS]);
+    }
 
+    const validCredentials = await user.compareHash(password);
     if (!validCredentials) {
       throw new BadRequestException(ErrorsMessages[ErrorCode.WRONG_CREDENTIALS]);
     }
 
     if (!user.emailVerified) {
-      throw new BadRequestException(ErrorsMessages[ErrorCode.EMAIL_NOT_VERIFIED]);
+      const lastToken = await this.authService.actionTokensService.findOne(
+        { user },
+        {},
+        { sort: 1 },
+      );
+      const lastTokenValid = dayjs(lastToken?.expiresOn).isAfter(dayjs());
+
+      if (lastTokenValid) {
+        throw new BadRequestException(ErrorsMessages[ErrorCode.EMAIL_NOT_VERIFIED_SENT_IN_15_MIN]);
+      }
+
+      const token = await this.authService.createAndGetActionToken(user, ActionTokenType.VERIFY_EMAIL);
+      await this.authService.sendEmailConfirm(user, token);
+      throw new BadRequestException(ErrorsMessages[ErrorCode.EMAIL_NOT_VERIFIED_SENT_NOW]);
     }
 
-    const tokenCookie = await this.authService.getAccessTokenCookie(user);
-    res.setHeader('Set-Cookie', tokenCookie);
+    const token = await this.authService.createAndGetAccessToken(user);
+    const expiresIn = 60 * 60 * 24 * 7 ; // 1 week
+
+    res.cookie(Cookies.JWT, token, {
+      maxAge: expiresIn,
+      secure: process.env.NODE_ENV === 'production',
+    });
 
     return user;
   }
@@ -112,7 +109,7 @@ export class UsersResolver {
   async logoutMe(
     @Context() { res }: ExpressContext
   ): Promise<boolean> {
-    res.cookie(Cookies.JWT, '', { expires: new Date(0) });
+    res.clearCookie(Cookies.JWT);
 
     return true;
   }

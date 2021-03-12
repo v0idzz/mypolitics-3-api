@@ -11,7 +11,7 @@ import { ActionToken, ActionTokenDocument } from './entities/action-token.entity
 import { MailerService } from '@nestjs-modules/mailer';
 import { nanoid } from 'nanoid';
 import { ActionTokenType } from './enums/action-token-type.enum';
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +23,7 @@ export class AuthService {
     private readonly logger: Logger,
     private readonly mailerService: MailerService,
     @InjectModel(ActionToken.name)
-    private readonly actionTokensService: Model<ActionTokenDocument>
+    public readonly actionTokensService: Model<ActionTokenDocument>
   ) {}
 
   private readonly RECAPTCHA_API_URL = 'https://www.google.com/recaptcha/api/siteverify';
@@ -61,17 +61,9 @@ export class AuthService {
     return this.jwtService.sign(payload, { expiresIn });
   }
 
-  async getAccessTokenCookie(user: User): Promise<string> {
-    const token = await this.createAndGetAccessToken(user);
-    const expiresIn = 60 * 60 * 24 * 7 ;// 1 week
-    const secure = process.env.NODE_ENV === 'production' ? 'Secure;' : '';
-
-    return `${Cookies.JWT}=${token}; HttpOnly; ${secure} Path=/; Max-Age=${expiresIn}`;
-  }
-
   async createAndGetActionToken(user: User, type: ActionTokenType) {
     const code = nanoid(32);
-    const expiresIn = 60 * 15; // 15 minutes
+    const expiresIn = 60 * 15;
     const expiresOn = dayjs().add(expiresIn, 'second').toISOString();
 
     const token: ActionToken = {

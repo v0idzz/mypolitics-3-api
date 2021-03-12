@@ -33,13 +33,21 @@ export const ErrorsMessages: Record<ErrorCode, ErrorMessage> = {
     code: ErrorCode.USER_EXISTS,
     text: 'User exists',
   },
-  [ErrorCode.EMAIL_NOT_VERIFIED]: {
-    code: ErrorCode.EMAIL_NOT_VERIFIED,
-    text: 'Email not verified',
+  [ErrorCode.EMAIL_NOT_VERIFIED_SENT_IN_15_MIN]: {
+    code: ErrorCode.EMAIL_NOT_VERIFIED_SENT_IN_15_MIN,
+    text: 'Email not verified. Mail sent in last 15 minutes',
   },
   [ErrorCode.USER_NOT_EXISTS]: {
     code: ErrorCode.USER_NOT_EXISTS,
     text: 'User not exists',
+  },
+  [ErrorCode.USER_ALREADY_VOTED]: {
+    code: ErrorCode.USER_ALREADY_VOTED,
+    text: 'User already voted',
+  },
+  [ErrorCode.EMAIL_NOT_VERIFIED_SENT_NOW]: {
+    code: ErrorCode.EMAIL_NOT_VERIFIED_SENT_NOW,
+    text: 'Email not verified. Mail sent now',
   },
 };
 

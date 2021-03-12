@@ -43,6 +43,7 @@ export class PartiesResolver {
     return this.partiesService.updateOne({ _id }, updatePartyInput);
   }
 
+  @UseGuards(GqlAuthGuard)
   @ResolveField(() => Boolean)
   viewerCanEdit(
     @Parent() party: Party,

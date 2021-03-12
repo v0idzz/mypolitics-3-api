@@ -3,7 +3,7 @@ import { QuizzesService } from './quizzes.service';
 import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { CreateQuizInput } from './dto/create-quiz.input';
 import { UpdateQuizInput } from './dto/update-quiz.input';
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { QuizMeta } from './entities/quiz-meta.entity';
 import { QuizType } from './enums/quiz-type.enum';
 import { QuizVersion } from '../quiz-versions/entities/quiz-version.entity';
@@ -15,6 +15,9 @@ import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
 import { QuizVerificationState } from './enums/quiz-verification-state.enum';
 import { UserRole } from '../users/enums/user-role';
 import { VerifyQuizInput } from './dto/verify-quiz.input';
+import { QuizVoteType } from './enums/quiz-vote-type.enum';
+import { ErrorsMessages } from '../../constants';
+import { ErrorCode } from '../../types';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
@@ -54,6 +57,10 @@ export class QuizzesResolver {
           authorizedParties: [],
           politiciansResults: false,
         },
+        votes: {
+          voters: [],
+          value: 0
+        }
       }
     });
   }
@@ -68,7 +75,7 @@ export class QuizzesResolver {
 
     return this.quizzesService.findOne(conditions, {}, {
       populate: {
-        path: 'versions currentVersion lastUpdatedVersion',
+        path: 'versions currentVersion lastUpdatedVersion meta.authors',
         populate: {
           path: 'ideologies axes traits questions parties',
         }
@@ -79,6 +86,14 @@ export class QuizzesResolver {
   @Query(() => [Quiz], { name: 'featuredQuizzes' })
   async findFeatured(): Promise<Quiz[]> {
     return this.quizzesService.getFeaturedQuizzes();
+  }
+
+  @UseGuards(GqlAuthGuard)
+  @Query(() => [Quiz], { name: 'currentUserQuizzes' })
+  async findCreatedByCurrentUser(
+    @CurrentUser() user: User,
+  ): Promise<Quiz[]> {
+    return this.quizzesService.findMany({ 'meta.authors': { $in: [user._id] } });
   }
 
   @UseGuards(GqlAuthGuard)
@@ -160,14 +175,40 @@ export class QuizzesResolver {
     return true;
   }
 
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async voteQuiz(
+    @Args({ name: 'id', type: () => String }) _id: string,
+    @Args({ name: 'type', type: () => QuizVoteType }) type: QuizVoteType,
+    @CurrentUser() user: User
+  ): Promise<boolean> {
+    const quiz = await this.quizzesService.findOne({ _id });
+    const currentVoters = quiz.meta.votes.voters as unknown as string[];
+
+    if (currentVoters.includes(user._id)) {
+      throw new BadRequestException(ErrorsMessages[ErrorCode.USER_ALREADY_VOTED]);
+    }
+
+    await quiz.updateOne({
+      $addToSet: {
+        'meta.votes.voters': user._id,
+      },
+      $inc: {
+        'meta.votes.value': type === QuizVoteType.FOR ? 1 : -1,
+      }
+    });
+
+    return true;
+  }
+
   @ResolveField()
   async meta(@Parent() quiz: QuizDocument): Promise<QuizMeta> {
     await quiz.populate('versions currentVersion').execPopulate();
-    const { currentVersion } = quiz;
+    const { currentVersion, meta } = quiz;
     const { compassModes, axes, questions, traits, parties, ideologies } = currentVersion;
 
     const features = {
-      ...quiz.meta.features,
+      ...meta.features,
       axesNumber: axes.length,
       questionsNumber: questions.length,
       compass: compassModes.length > 0,
@@ -177,8 +218,12 @@ export class QuizzesResolver {
     };
 
     return {
-      ...quiz.meta,
+      ...meta,
       features,
+      votes: {
+        ...meta.votes,
+        value: typeof meta.votes.value === 'number' ? meta.votes.value : 0,
+      }
     };
   }
 

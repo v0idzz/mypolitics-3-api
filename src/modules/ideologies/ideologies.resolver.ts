@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, ResolveField, Parent, Context, GqlExecutionContext } from '@nestjs/graphql';
 import { IdeologiesService } from './ideologies.service';
 import { Ideology } from './entities/ideology.entity';
 import { CreateIdeologyInput } from './dto/create-ideology.input';
@@ -45,7 +45,7 @@ export class IdeologiesResolver {
   @ResolveField(() => Boolean)
   viewerCanEdit(
     @Parent() ideology: Ideology,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ) {
     return ideology.isAuthor(user) || user.isAdmin();
   }

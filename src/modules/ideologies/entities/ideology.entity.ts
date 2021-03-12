@@ -25,10 +25,8 @@ export class Ideology extends BaseEntity {
   @Field(() => IdeologyIcon)
   icon: IdeologyIcon;
 
-  @Field(() => Boolean)
-  viewerCanEdit?: boolean;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
   @Field(() => [User])
   authors: User[];
 

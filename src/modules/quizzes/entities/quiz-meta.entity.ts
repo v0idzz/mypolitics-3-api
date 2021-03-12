@@ -43,6 +43,24 @@ class QuizStatistics {
 
 @ObjectType()
 @Schema()
+class QuizVotes {
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'User' }],
+    default: [],
+  })
+  @Field(() => [User])
+  voters: User[];
+
+  @Prop({
+    type: mongoose.Schema.Types.Number,
+    default: 0,
+  })
+  @Field(() => Int)
+  value: number;
+}
+
+@ObjectType()
+@Schema()
 export class QuizMeta {
   @Prop(raw(QuizFeatures))
   @Field(() => QuizFeatures)
@@ -51,6 +69,10 @@ export class QuizMeta {
   @Prop(raw(QuizStatistics))
   @Field(() => QuizStatistics)
   statistics: QuizStatistics;
+
+  @Prop(raw(QuizVotes))
+  @Field(() => QuizVotes)
+  votes: QuizVotes;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
   @Field(() => [User])

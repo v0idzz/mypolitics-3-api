@@ -56,8 +56,8 @@ type Ideology {
   description: TextTranslation!
   color: String!
   icon: IdeologyIcon!
-  viewerCanEdit: Boolean!
   authors: [User!]!
+  viewerCanEdit: Boolean!
 }
 
 type QuizAxis {
@@ -126,6 +126,7 @@ type QuizVersion {
   createdAt: DateTime!
   updatedAt: DateTime!
   publishedOn: DateTime
+  verifiedOn: DateTime
   axes: [QuizAxis]!
   parent: QuizVersion
   questions: [Question]!
@@ -183,9 +184,15 @@ type QuizStatistics {
   surveysNumber: Int!
 }
 
+type QuizVotes {
+  voters: [User!]!
+  value: Int!
+}
+
 type QuizMeta {
   features: QuizFeatures!
   statistics: QuizStatistics!
+  votes: QuizVotes!
   authors: [User!]!
   license: QuizLicense!
 }
@@ -252,8 +259,8 @@ type ResultsIdeology {
   description: TextTranslation!
   color: String!
   icon: IdeologyIcon!
-  viewerCanEdit: Boolean!
   authors: [User!]!
+  viewerCanEdit: Boolean!
   points: Int!
   maxPoints: Int!
 }
@@ -297,6 +304,7 @@ type Query {
   survey(id: String!): Survey!
   quiz(slug: String!): Quiz!
   featuredQuizzes: [Quiz!]!
+  currentUserQuizzes: [Quiz!]!
   verifyQueueQuizzes: [Quiz!]!
   quizVersion(id: String!): QuizVersion!
   results(surveyId: String!): Results!
@@ -315,6 +323,7 @@ type Mutation {
   updateQuiz(updateQuizInput: UpdateQuizInput!, id: String!): Quiz!
   requestQuizVerify(id: String!): Boolean!
   verifyQuiz(verifyQuizInput: VerifyQuizInput!, id: String!): Boolean!
+  voteQuiz(type: QuizVoteType!, id: String!): Boolean!
   createQuizVersion(createQuizVersionInput: CreateQuizVersionInput!, quizId: String!): QuizVersion!
   saveQuizVersion(saveQuizVersionInput: UpdateQuizVersionInput!, publish: Boolean!, id: String!): QuizVersion!
   updateQuizVersion(updateQuizVersionInput: UpdateQuizVersionInput!, id: String!): QuizVersion!
@@ -327,7 +336,6 @@ type Mutation {
   updateQuestion(updateQuestionInput: UpdateQuestionInput!, id: String!): Question!
   addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, quizVersionId: String!, partyId: String!): Boolean!
   createUser(createUserInput: CreateUserInput!): User!
-  resendEmail(recaptcha: String!, email: String!): User!
   loginUser(loginUserInput: LoginUserInput!): User!
   logoutMe: Boolean!
 }
@@ -386,6 +394,11 @@ input UpdateQuizInput {
 input VerifyQuizInput {
   state: QuizVerificationState!
   reason: String!
+}
+
+enum QuizVoteType {
+  FOR
+  AGAINST
 }
 
 input CreateQuizVersionInput {

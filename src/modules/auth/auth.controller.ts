@@ -32,7 +32,7 @@ export class AuthController {
       expires: dayjs().add(7, 'day').toDate(),
     });
 
-    res.redirect('/');
+    res.redirect('/editor');
   }
 
   @Get('verify')
@@ -46,7 +46,7 @@ export class AuthController {
     const verified = this.authService.verifyActionToken(code, userId);
 
     if (verified) {
-      res.redirect('/');
+      res.redirect('/auth?state=verified');
     }
   }
 }
