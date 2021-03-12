@@ -18,12 +18,14 @@ import { VerifyQuizInput } from './dto/verify-quiz.input';
 import { QuizVoteType } from './enums/quiz-vote-type.enum';
 import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
+import { AuthService } from '../auth/auth.service';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
   constructor(
     private readonly quizzesService: QuizzesService,
     private readonly quizVersionsService: QuizVersionsService,
+    private readonly authService: AuthService,
   ) {}
 
   @Mutation(() => Quiz)
@@ -131,10 +133,17 @@ export class QuizzesResolver {
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   async requestQuizVerify(
-    @Args({ name: 'id', type: () => String }) _id: string,
+    @Args({ name: 'quizVersion', type: () => String }) _id: string,
+    @Args({ name: 'recaptcha', type: () => String }) recaptcha: string,
     @CurrentUser() user: User
   ): Promise<boolean> {
-    const quiz = await this.quizzesService.findOne({ _id });
+    const captchaValid = await this.authService.validateReCaptcha(recaptcha);
+    if (!captchaValid) {
+      throw new BadRequestException();
+    }
+
+    const quizVersion = await this.quizVersionsService.findOne({ _id });
+    const quiz = await this.quizzesService.findOne({ versions: { $in: [quizVersion] } });
 
     if (!quiz.isAuthor(user)) {
       throw new UnauthorizedException();
@@ -142,7 +151,7 @@ export class QuizzesResolver {
 
     await quiz.updateOne({
       verifyRequest: {
-        version: quiz.lastUpdatedVersion,
+        version: quizVersion,
         state: QuizVerificationState.IDLE
       }
     });
@@ -153,7 +162,7 @@ export class QuizzesResolver {
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   async verifyQuiz(
-    @Args({ name: 'id', type: () => String }) _id: string,
+    @Args({ name: 'quizVersion', type: () => String }) _id: string,
     @Args('verifyQuizInput') verifyQuizInput: VerifyQuizInput,
     @CurrentUser() user: User
   ): Promise<boolean> {
@@ -162,8 +171,8 @@ export class QuizzesResolver {
       throw new UnauthorizedException();
     }
 
-    const quiz = await this.quizzesService.findOne({ _id });
-
+    const quizVersion = await this.quizVersionsService.findOne({ _id });
+    const quiz = await this.quizzesService.findOne({ versions: { $in: [quizVersion] } });
     await quiz.updateOne({
       verifyRequest: {
         version: quiz.verifyRequest.version,

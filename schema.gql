@@ -307,8 +307,8 @@ type Query {
   currentUserQuizzes: [Quiz!]!
   verifyQueueQuizzes: [Quiz!]!
   quizVersion(id: String!): QuizVersion!
-  results(surveyId: String!): Results!
   me: User!
+  results(surveyId: String!): Results!
 }
 
 type Mutation {
@@ -321,12 +321,15 @@ type Mutation {
   deleteSurvey(id: String!): Boolean!
   createQuiz(createQuizInput: CreateQuizInput!): Quiz!
   updateQuiz(updateQuizInput: UpdateQuizInput!, id: String!): Quiz!
-  requestQuizVerify(id: String!): Boolean!
-  verifyQuiz(verifyQuizInput: VerifyQuizInput!, id: String!): Boolean!
+  requestQuizVerify(recaptcha: String!, quizVersion: String!): Boolean!
+  verifyQuiz(verifyQuizInput: VerifyQuizInput!, quizVersion: String!): Boolean!
   voteQuiz(type: QuizVoteType!, id: String!): Boolean!
   createQuizVersion(createQuizVersionInput: CreateQuizVersionInput!, quizId: String!): QuizVersion!
   saveQuizVersion(saveQuizVersionInput: UpdateQuizVersionInput!, publish: Boolean!, id: String!): QuizVersion!
   updateQuizVersion(updateQuizVersionInput: UpdateQuizVersionInput!, id: String!): QuizVersion!
+  createUser(createUserInput: CreateUserInput!): User!
+  loginUser(loginUserInput: LoginUserInput!): User!
+  logoutMe: Boolean!
   createIdeology(createIdeologyInput: CreateIdeologyInput!): Ideology!
   updateIdeology(updateIdeologyInput: UpdateIdeologyInput!, id: String!): Ideology!
   createParty(createPartyInput: CreatePartyInput!): Party!
@@ -335,9 +338,6 @@ type Mutation {
   createManyQuestions(createManyQuestionsInput: [CreateQuestionInput!]!, quizVersion: String!): [Question!]!
   updateQuestion(updateQuestionInput: UpdateQuestionInput!, id: String!): Question!
   addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, quizVersionId: String!, partyId: String!): Boolean!
-  createUser(createUserInput: CreateUserInput!): User!
-  loginUser(loginUserInput: LoginUserInput!): User!
-  logoutMe: Boolean!
 }
 
 input CreateRespondentInput {
@@ -443,6 +443,19 @@ input UpdateQuizVersionInput {
   parties: [String]!
 }
 
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+  recaptcha: String!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+  recaptcha: String!
+}
+
 input CreateIdeologyInput {
   name: TextTranslationInput!
   description: TextTranslationInput!
@@ -497,17 +510,4 @@ input UpdateQuestionInput {
 input AddPartyAnswersInput {
   questionText: TextTranslationInput!
   answer: SurveyAnswerType!
-}
-
-input CreateUserInput {
-  name: String!
-  email: String!
-  password: String!
-  recaptcha: String!
-}
-
-input LoginUserInput {
-  email: String!
-  password: String!
-  recaptcha: String!
 }

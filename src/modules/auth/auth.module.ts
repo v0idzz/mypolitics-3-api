@@ -3,7 +3,7 @@ import { AuthController } from './auth.controller';
 import { FacebookStrategy } from './strategies/facebook.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import authConfig from '../../config/auth.config';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { UsersService } from '../users/users.service';
 import { MongooseModule } from '@nestjs/mongoose';

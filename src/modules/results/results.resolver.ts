@@ -20,7 +20,6 @@ export class ResultsResolver {
     private readonly resultsClassicService: ResultsClassicService,
   ) {}
 
-  @UseGuards(GqlAuthGuard)
   @Query(() => Results)
   async results(
     @Args({ name: 'surveyId', type: () => String }) _id: string,
@@ -58,11 +57,6 @@ export class ResultsResolver {
     }
 
     const quiz = await this.quizzesService.findOne({ versions: { $in: [survey.quizVersion] } });
-    const canSee = quiz.type === QuizType.OFFICIAL || !!survey.quizVersion.verifiedOn || (user && quiz.isAuthor(user));
-    if (!canSee) {
-      throw new UnauthorizedException(ErrorsMessages[ErrorCode.NOT_AUTHORIZED]);
-    }
-
     const answersResults = getAnswersResults(survey);
     const { _id: surveyId, createdAt, updatedAt } = survey;
 

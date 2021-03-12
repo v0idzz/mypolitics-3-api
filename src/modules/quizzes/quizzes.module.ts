@@ -10,10 +10,12 @@ import { QuizVersion, QuizVersionSchema } from '../quiz-versions/entities/quiz-v
 import { QuizVersionsService } from '../quiz-versions/quiz-versions.service';
 import { QuizVersionsModule } from '../quiz-versions/quiz-versions.module';
 import { QuizVerifyRequest, QuizVerifyRequestSchema } from './entities/quiz-verify-request.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     forwardRef(() => QuizVersionsModule),
+    forwardRef(() => AuthModule),
     ConfigModule.forFeature(quizzesConfig),
     MongooseModule.forFeature([
       { name: Quiz.name, schema: QuizSchema },

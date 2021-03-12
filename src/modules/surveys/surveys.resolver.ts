@@ -51,7 +51,7 @@ export class SurveysResolver {
       populate: {
         path: 'quizVersion answers',
         populate: {
-          path: 'questions question',
+          path: 'questions question quiz',
           populate: {
             path: 'effects',
             populate: {
