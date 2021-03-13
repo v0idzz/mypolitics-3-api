@@ -340,6 +340,7 @@ type Mutation {
   addPartyAnswers(addPartyAnswersInput: [AddPartyAnswersInput!]!, quizVersionId: String!, partyId: String!): Boolean!
 }
 
+
 input CreateRespondentInput {
   lang: Language!
 }
