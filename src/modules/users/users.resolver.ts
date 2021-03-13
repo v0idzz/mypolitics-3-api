@@ -94,11 +94,11 @@ export class UsersResolver {
     }
 
     const token = await this.authService.createAndGetAccessToken(user);
-    const expiresIn = 60 * 60 * 24 * 7 ; // 1 week
 
     res.cookie(Cookies.JWT, token, {
-      maxAge: expiresIn,
+      expires: dayjs().add(7, 'day').toDate(),
       secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
     });
 
     return user;
@@ -109,7 +109,10 @@ export class UsersResolver {
   async logoutMe(
     @Context() { res }: ExpressContext
   ): Promise<boolean> {
-    res.clearCookie(Cookies.JWT, { httpOnly: true });
+    res.clearCookie(Cookies.JWT, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
 
     return true;
   }
