@@ -21,7 +21,7 @@ export class RespondentMiddleware implements NestMiddleware {
       const languages = [Language.ENGLISH, Language.POLISH];
       const acceptLanguage = req.headers['accept-language'];
       const userAgent = req.headers['user-agent'];
-      if (!acceptLanguage || userAgent.includes('node-fetch')) {
+      if (userAgent.includes('node-fetch')) {
         next();
         return;
       }
