@@ -328,8 +328,6 @@ type Mutation {
   saveQuizVersion(saveQuizVersionInput: UpdateQuizVersionInput!, publish: Boolean!, id: String!): QuizVersion!
   updateQuizVersion(updateQuizVersionInput: UpdateQuizVersionInput!, id: String!): QuizVersion!
   createUser(createUserInput: CreateUserInput!): User!
-  loginUser(loginUserInput: LoginUserInput!): User!
-  logoutMe: Boolean!
   createIdeology(createIdeologyInput: CreateIdeologyInput!): Ideology!
   updateIdeology(updateIdeologyInput: UpdateIdeologyInput!, id: String!): Ideology!
   createParty(createPartyInput: CreatePartyInput!): Party!
@@ -445,12 +443,6 @@ input UpdateQuizVersionInput {
 
 input CreateUserInput {
   name: String!
-  email: String!
-  password: String!
-  recaptcha: String!
-}
-
-input LoginUserInput {
   email: String!
   password: String!
   recaptcha: String!
