@@ -109,7 +109,7 @@ export class UsersResolver {
   async logoutMe(
     @Context() { res }: ExpressContext
   ): Promise<boolean> {
-    res.clearCookie(Cookies.JWT);
+    res.clearCookie(Cookies.JWT, { httpOnly: true });
 
     return true;
   }
