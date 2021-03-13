@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { Headers, Cookies as ConstCookies } from '../../constants';
+import { Cookies as ConstCookies } from '../../constants';
 import Cookies from 'cookies';
 import parser from 'accept-language-parser';
 import { RespondentsService } from '../../modules/respondents/respondents.service';
@@ -13,9 +13,7 @@ export class RespondentMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const cookies = new Cookies(req, res);
-    const respondentHeader = req.headers[Headers.RESPONDENT];
-    const respondentCookie = cookies.get(ConstCookies.RESPONDENT);
-    let respondentData = respondentHeader || respondentCookie;
+    let respondentData = cookies.get(ConstCookies.RESPONDENT);
 
     if (!respondentData || typeof respondentData !== 'string') {
       const languages = [Language.ENGLISH, Language.POLISH];
@@ -33,6 +31,8 @@ export class RespondentMiddleware implements NestMiddleware {
       respondentData = Buffer.from(JSON.stringify({ _id })).toString('base64');
       cookies.set(ConstCookies.RESPONDENT, respondentData, {
         expires: dayjs().add(3, 'month').toDate(),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
       });
     }
 
