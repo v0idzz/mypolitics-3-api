@@ -3,7 +3,6 @@ import { GATEWAY_BUILD_SERVICE } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { Cookies, Headers } from '../../constants';
 
-
 class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   willSendRequest({ request, context }) {
     if (!context.req) {
@@ -43,17 +42,12 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
         if (!value) {
           return;
         }
-        const valueArr = value.split(',');
 
-        if (valueArr.length > 1) {
-          context.res.setHeader(name, valueArr);
-        } else {
-          context.res.setHeader(name, value);
-        }
+        context.res.setHeader(name, value);
       })
     );
 
-    setHeaders([Headers.RESPONDENT, 'set-cookie']);
+    setHeaders(['set-cookie']);
 
     return response;
   }
