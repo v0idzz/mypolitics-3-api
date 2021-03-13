@@ -109,8 +109,12 @@ export class QuestionsResolver {
 
           await question.updateOne({
             $pull: {
-              ['effects.agree.parties']: party._id,
-              ['effects.disagree.parties']: party._id,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+              // @ts-ignore
+              'effects.agree.parties': party._id,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+              // @ts-ignore
+              'effects.disagree.parties': party._id,
             },
           }, { multi: true });
 
