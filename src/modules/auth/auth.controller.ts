@@ -84,7 +84,9 @@ export class AuthController {
       const lastToken = await this.authService.actionTokensService.findOne(
         { user },
         {},
-        { sort: 1 },
+        { sort: {
+          expiresOn: 1,
+        } },
       );
       const lastTokenValid = dayjs(lastToken?.expiresOn).isAfter(dayjs());
 
