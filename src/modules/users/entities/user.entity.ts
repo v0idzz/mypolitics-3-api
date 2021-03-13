@@ -39,9 +39,9 @@ export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.isAdmin = function () {
-  return this.role === UserRole.ADMIN;
+  return this['_doc'].role === UserRole.ADMIN;
 };
 
 UserSchema.methods.compareHash = async function (password: string) {
-  return bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, this['_doc'].password);
 };

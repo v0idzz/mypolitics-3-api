@@ -109,8 +109,8 @@ export class QuestionsResolver {
 
           await question.updateOne({
             $pull: {
-              'effects.agree.parties': party._id,
-              'effects.disagree.parties': party._id,
+              ['effects.agree.parties']: party._id,
+              ['effects.disagree.parties']: party._id,
             },
           }, { multi: true });
 
