@@ -43,9 +43,10 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
         if (!value) {
           return;
         }
+        const valueArr = value.split(',');
 
-        if (value.length) {
-          value.forEach((v) => context.res.setHeader(name, v));
+        if (valueArr.length > 1) {
+          context.res.setHeader(name, valueArr);
         } else {
           context.res.setHeader(name, value);
         }
