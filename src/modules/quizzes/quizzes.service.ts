@@ -21,8 +21,12 @@ export class QuizzesService extends BaseService<QuizDocument> {
     return this.findMany({ slug: { $in: slugs } });
   }
 
+  getFeaturedSlugs(): string[] {
+    return this.configService.get<string[]>('quizzes.featuredSlugs');
+  }
+
   isFeatured(quiz: Quiz): boolean {
-    const slugs = this.configService.get<string[]>('quizzes.featuredSlugs');
+    const slugs = this.getFeaturedSlugs();
     return slugs.includes(quiz.slug);
   }
 

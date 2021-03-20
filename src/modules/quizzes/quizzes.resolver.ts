@@ -1,4 +1,4 @@
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { QuizzesService } from './quizzes.service';
 import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { CreateQuizInput } from './dto/create-quiz.input';
@@ -108,9 +108,35 @@ export class QuizzesResolver {
       throw new UnauthorizedException();
     }
 
-    return this.quizzesService.findMany({
+    const quizzes = await this.quizzesService.findMany({
       'verifyRequest.state': QuizVerificationState.IDLE,
     });
+
+    return quizzes.sort((a, b) => (
+      b.meta.votes.value - a.meta.votes.value
+    ));
+  }
+
+  @Query(() => [Quiz], { name: 'socialQuizzes' })
+  async findSocialQuizzes(): Promise<Quiz[]> {
+    const quizzes = await this.quizzesService.findMany({
+      'verifyRequest.state': QuizVerificationState.ACCEPTED,
+      $where: 'this.verifyRequest.quizVersion == this.quizVersion',
+      slug: {
+        $nin: this.quizzesService.getFeaturedSlugs()
+      },
+    });
+
+    const getWeight = ({ meta: { votes, statistics: { surveysNumber } } }: Quiz) => {
+      const votesValue = typeof votes.value === 'number' ? votes.value : 0;
+      const randomWeight = Math.random() * surveysNumber + 1;
+
+      return (
+        (votesValue * 0.2 + surveysNumber * 0.2 + randomWeight * 0.8) / 3
+      );
+    };
+
+    return quizzes.sort((a, b) => getWeight(b) - getWeight(a));
   }
 
   @Mutation(() => Quiz)
