@@ -215,6 +215,7 @@ export class QuizzesResolver {
     await quiz.populate('versions currentVersion').execPopulate();
     const { currentVersion, meta } = quiz;
     const { compassModes, axes, questions, traits, parties, ideologies } = currentVersion;
+    const rawVotesValue = quiz['_doc'].meta.votes.value;
 
     const features = {
       ...meta.features,
@@ -231,7 +232,8 @@ export class QuizzesResolver {
       features,
       votes: {
         ...meta.votes,
-        value: typeof meta.votes.value === 'number' ? meta.votes.value : 0,
+        // reverse compatibility with docs without votes
+        value: typeof rawVotesValue === 'number' ? rawVotesValue : 0,
       }
     };
   }

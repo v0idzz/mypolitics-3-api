@@ -1,7 +1,7 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { Results } from './entities/results.entity';
 import { SurveysService } from '../surveys/surveys.service';
-import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
 import { getAnswersResults } from './utils/get-answers-results';
@@ -9,8 +9,6 @@ import { QuizzesService } from '../quizzes/quizzes.service';
 import { ResultsClassicService } from '../results-classic/results-classic.service';
 import { CurrentUser } from '../../shared/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
-import { QuizType } from '../quizzes/enums/quiz-type.enum';
-import { GqlAuthGuard } from '../../shared/guards/gql-auth.guard';
 
 @Resolver(() => Results)
 export class ResultsResolver {
