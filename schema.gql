@@ -203,6 +203,9 @@ enum QuizLicense {
 }
 
 type QuizVerifyRequest {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   version: QuizVersion!
   moderator: User
   reason: String

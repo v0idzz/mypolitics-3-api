@@ -7,10 +7,11 @@ import * as mongoose from 'mongoose';
 import { User } from '../../users/entities/user.entity';
 import { QuizVersion } from '../../quiz-versions/entities/quiz-version.entity';
 import { QuizVerificationState } from '../enums/quiz-verification-state.enum';
+import { BaseEntity } from '../../../shared/base/base.entity';
 
 @ObjectType()
 @Schema()
-export class QuizVerifyRequest {
+export class QuizVerifyRequest extends BaseEntity {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'QuizVersion' })
   @Field(() => QuizVersion)
   version: QuizVersion;

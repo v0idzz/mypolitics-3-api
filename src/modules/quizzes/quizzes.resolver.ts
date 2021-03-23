@@ -19,6 +19,8 @@ import { QuizVoteType } from './enums/quiz-vote-type.enum';
 import { ErrorsMessages } from '../../constants';
 import { ErrorCode } from '../../types';
 import { AuthService } from '../auth/auth.service';
+import { getVotesWeight, getWeight } from './utils/get-quiz-weight';
+import _ from 'lodash';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
@@ -127,16 +129,23 @@ export class QuizzesResolver {
       },
     });
 
-    const getWeight = ({ meta: { votes, statistics: { surveysNumber } } }: Quiz) => {
-      const votesValue = typeof votes.value === 'number' ? votes.value : 0;
-      const randomWeight = Math.random() * surveysNumber + 1;
+    const maxSurveysQuiz = _.maxBy(quizzes, q => q.meta.statistics.surveysNumber);
+    const maxSurveys = maxSurveysQuiz.meta.statistics.surveysNumber;
+    const maxVotesQuiz = _.maxBy(quizzes, q => getVotesWeight(q['_doc'].meta.votes));
+    const maxVotes = getVotesWeight(maxVotesQuiz['_doc'].meta.votes);
+    const weight: Record<string, number> = {};
 
-      return (
-        (votesValue * 0.2 + surveysNumber * 0.2 + randomWeight * 0.8) / 3
-      );
+    const getWeightMemo = (q: Quiz) => {
+      if (typeof weight[q._id] !== 'undefined') {
+        return weight[q._id];
+      }
+
+      const quizWeight = getWeight(q, { maxSurveys, maxVotes });
+      weight[q._id] = quizWeight;
+      return quizWeight;
     };
 
-    return quizzes.sort((a, b) => getWeight(b) - getWeight(a));
+    return quizzes.sort((a, b) => getWeightMemo(b) - getWeightMemo(a));
   }
 
   @Mutation(() => Quiz)
