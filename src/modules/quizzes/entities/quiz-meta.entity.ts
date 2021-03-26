@@ -5,6 +5,7 @@ import { QuizLicense } from '../enums/quiz-license.enum';
 import { Types } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { User } from '../../users/entities/user.entity';
+import { Language } from '../../../shared/enums/language.enum';
 
 @ObjectType()
 @Schema()
@@ -81,6 +82,13 @@ export class QuizMeta {
   @Prop(mongoose.Schema.Types.String)
   @Field(() => QuizLicense)
   license: QuizLicense;
+
+  @Prop({
+    type: raw([mongoose.Schema.Types.String]),
+    default: [Language.POLISH],
+  })
+  @Field(() => [Language])
+  languages: Language[];
 }
 
 export const QuizMetaSchema = SchemaFactory.createForClass(QuizMeta);

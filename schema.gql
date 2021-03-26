@@ -195,11 +195,17 @@ type QuizMeta {
   votes: QuizVotes!
   authors: [User!]!
   license: QuizLicense!
+  languages: [Language!]!
 }
 
 enum QuizLicense {
   COMMERCIAL
   MIT
+}
+
+enum Language {
+  POLISH
+  ENGLISH
 }
 
 type QuizVerifyRequest {
@@ -309,7 +315,7 @@ type Query {
   featuredQuizzes: [Quiz!]!
   currentUserQuizzes: [Quiz!]!
   verifyQueueQuizzes: [Quiz!]!
-  socialQuizzes: [Quiz!]!
+  socialQuizzes(lang: Language!): [Quiz!]!
   quizVersion(id: String!): QuizVersion!
   me: User!
   results(surveyId: String!): Results!
@@ -346,11 +352,6 @@ input CreateRespondentInput {
   lang: Language!
 }
 
-enum Language {
-  POLISH
-  ENGLISH
-}
-
 input UpdateRespondentInput {
   details: RespondentDetailsInput!
 }
@@ -379,6 +380,7 @@ input CreateQuizInput {
   logoUrl: String!
   title: TextTranslationInput!
   description: TextTranslationInput!
+  languages: [Language!]!
 }
 
 input TextTranslationInput {
@@ -391,6 +393,7 @@ input UpdateQuizInput {
   logoUrl: String
   description: TextTranslationInput
   currentVersion: String
+  languages: [Language!]!
 }
 
 input VerifyQuizInput {

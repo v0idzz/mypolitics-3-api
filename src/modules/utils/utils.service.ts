@@ -4,6 +4,7 @@ import oeTemplate from './templates/oe';
 import rpTemplate from './templates/rp';
 import interviewTemplate from './templates/interview';
 import dmTemplate from './templates/dm';
+import quizTemplate from './templates/quiz';
 import nodeHtmlToImage from 'node-html-to-image';
 
 const imagesTemplates = {
@@ -12,6 +13,7 @@ const imagesTemplates = {
   'rp': rpTemplate,
   'dm': dmTemplate,
   'interview': interviewTemplate,
+  'quiz': quizTemplate,
 };
 
 @Injectable()

@@ -21,6 +21,7 @@ import { ErrorCode } from '../../types';
 import { AuthService } from '../auth/auth.service';
 import { getVotesWeight, getWeight } from './utils/get-quiz-weight';
 import _ from 'lodash';
+import { Language } from '../../shared/enums/language.enum';
 
 @Resolver(() => Quiz)
 export class QuizzesResolver {
@@ -33,7 +34,7 @@ export class QuizzesResolver {
   @Mutation(() => Quiz)
   @UseGuards(GqlAuthGuard)
   async createQuiz(
-    @Args('createQuizInput') createQuizInput: CreateQuizInput,
+    @Args('createQuizInput') { languages, ...createQuizInput }: CreateQuizInput,
     @CurrentUser() user: User
   ) {
     const slug = await this.quizzesService.getSlug();
@@ -54,6 +55,7 @@ export class QuizzesResolver {
       meta: {
         license: QuizLicense.MIT,
         authors: [user],
+        languages,
         statistics: {
           surveysNumber: 0,
         },
@@ -64,7 +66,7 @@ export class QuizzesResolver {
         votes: {
           voters: [],
           value: 0
-        }
+        },
       }
     });
   }
@@ -120,14 +122,41 @@ export class QuizzesResolver {
   }
 
   @Query(() => [Quiz], { name: 'socialQuizzes' })
-  async findSocialQuizzes(): Promise<Quiz[]> {
+  async findSocialQuizzes(
+    @Args({ name: 'lang', type: () => Language }) lang: Language,
+  ): Promise<Quiz[]> {
+    // reverse compatibility
+    const langFilter = (lang === Language.POLISH ? {
+      $or: [
+        {
+          'meta.languages': {
+            $in: [lang],
+          },
+        },
+        {
+          'meta.languages': {
+            $exists: false,
+          },
+        }
+      ]
+    } : {
+      'meta.languages': {
+        $in: [lang]
+      }
+    });
+
     const quizzes = await this.quizzesService.findMany({
       'verifyRequest.state': QuizVerificationState.ACCEPTED,
       $where: 'this.verifyRequest.quizVersion == this.quizVersion',
       slug: {
         $nin: this.quizzesService.getFeaturedSlugs()
       },
+      ...langFilter
     });
+
+    if (quizzes.length === 0) {
+      return [];
+    }
 
     const maxSurveysQuiz = _.maxBy(quizzes, q => q.meta.statistics.surveysNumber);
     const maxSurveys = maxSurveysQuiz.meta.statistics.surveysNumber;

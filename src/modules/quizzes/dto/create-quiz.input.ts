@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { TextTranslationInput } from '../../../shared/entities/text-translation.entity';
+import { Language } from '../../../shared/enums/language.enum';
 
 @InputType()
 export class CreateQuizInput {
@@ -11,4 +12,7 @@ export class CreateQuizInput {
 
   @Field(() => TextTranslationInput)
   description: TextTranslationInput;
+
+  @Field(() => [Language])
+  languages: Language[];
 }
