@@ -23,7 +23,7 @@ export class UtilsService {
 
     return await nodeHtmlToImage({
       content,
-      puppeteerArgs: { args: ["--no-sandbox"] },
+      puppeteerArgs: { args: ['--no-sandbox'] },
       html: `<html>
           <head>
             <style>
