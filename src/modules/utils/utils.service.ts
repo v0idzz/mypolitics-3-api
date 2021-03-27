@@ -25,7 +25,7 @@ export class UtilsService {
       content,
       puppeteerArgs: {
         args: ['--no-sandbox'],
-        executablePath: 'google-chrome-unstable'
+        executablePath: 'google-chrome-stable'
       },
       html: `<html>
           <head>
