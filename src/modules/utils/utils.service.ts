@@ -23,7 +23,10 @@ export class UtilsService {
 
     return await nodeHtmlToImage({
       content,
-      puppeteerArgs: { args: ['--no-sandbox'] },
+      puppeteerArgs: {
+        args: ['--no-sandbox'],
+        executablePath: 'google-chrome-unstable'
+      },
       html: `<html>
           <head>
             <style>
