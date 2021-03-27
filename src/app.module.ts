@@ -4,6 +4,7 @@ import { GraphQLGatewayModule, GraphQLFederationModule, GATEWAY_BUILD_SERVICE } 
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { RateLimiterModule } from 'nestjs-rate-limiter/dist';
 
 import { MinioModule } from './modules/minio/minio.module';
 import { PubSubModule } from './modules/pubsub/pubsub.module';
@@ -100,6 +101,7 @@ import { UtilsModule } from './modules/utils/utils.module';
     AuthModule,
     UsersModule,
     UtilsModule,
+    RateLimiterModule,
   ],
   controllers: [],
   providers: [RespondentsService, Logger],

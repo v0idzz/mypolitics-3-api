@@ -1,6 +1,7 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseInterceptors } from '@nestjs/common';
 import { UtilsService } from './utils.service';
 import { Response } from 'express';
+import { RateLimit, RateLimiterInterceptor } from 'nestjs-rate-limiter/dist';
 
 const getOptions = (data: string): Record<string, string> => {
   const dataObject = Buffer.from(data, 'base64').toString();
@@ -13,7 +14,8 @@ export class UtilsController {
     private readonly utilsService: UtilsService,
   ) {}
 
-
+  @UseInterceptors(RateLimiterInterceptor)
+  @RateLimit({ keyPrefix: 'images', points: 1, duration: 60, errorMessage: 'Images cannot be generated more than once in per minute' })
   @Get('images')
   async getImage(
     @Res() res: Response,

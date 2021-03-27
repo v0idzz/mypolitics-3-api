@@ -21,12 +21,14 @@ export class UtilsService {
   async getTemplateImage(templateName: string, content: Record<string, string>): Promise<any> {
     const template = imagesTemplates[templateName];
 
+    const prodArgs = {
+      args: ['--no-sandbox'],
+      executablePath: 'google-chrome-stable'
+    };
+
     return await nodeHtmlToImage({
       content,
-      puppeteerArgs: {
-        args: ['--no-sandbox'],
-        executablePath: 'google-chrome-stable'
-      },
+      puppeteerArgs: process.env.NODE_ENV === 'production' ? prodArgs : {},
       html: `<html>
           <head>
             <style>
