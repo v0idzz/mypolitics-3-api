@@ -1,4 +1,4 @@
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { QuizzesService } from './quizzes.service';
 import { Quiz, QuizDocument } from './entities/quiz.entity';
 import { CreateQuizInput } from './dto/create-quiz.input';
@@ -124,6 +124,8 @@ export class QuizzesResolver {
   @Query(() => [Quiz], { name: 'socialQuizzes' })
   async findSocialQuizzes(
     @Args({ name: 'lang', type: () => Language }) lang: Language,
+    @Args({ name: 'limit', type: () => Int, nullable: true }) limit?: number,
+    @Args({ name: 'skip', type: () => Int, nullable: true }) skip?: number,
   ): Promise<Quiz[]> {
     // reverse compatibility
     const langFilter = (lang === Language.POLISH ? {
@@ -174,7 +176,9 @@ export class QuizzesResolver {
       return quizWeight;
     };
 
-    return quizzes.sort((a, b) => getWeightMemo(b) - getWeightMemo(a));
+    const sortedQuizzes = quizzes.sort((a, b) => getWeightMemo(b) - getWeightMemo(a));
+
+    return sortedQuizzes.slice(skip, limit);
   }
 
   @Mutation(() => Quiz)

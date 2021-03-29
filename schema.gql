@@ -315,7 +315,7 @@ type Query {
   featuredQuizzes: [Quiz!]!
   currentUserQuizzes: [Quiz!]!
   verifyQueueQuizzes: [Quiz!]!
-  socialQuizzes(lang: Language!): [Quiz!]!
+  socialQuizzes(skip: Int, limit: Int, lang: Language!): [Quiz!]!
   quizVersion(id: String!): QuizVersion!
   me: User!
   results(surveyId: String!): Results!
