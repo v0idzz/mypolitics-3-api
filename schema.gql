@@ -83,6 +83,7 @@ enum Country {
   POLAND
   ENGLAND
   UNITED_STATES
+  SERBIA
 }
 
 type QuestionPositiveEffect {
