@@ -20,6 +20,7 @@ type RespondentDetails {
 type TextTranslation {
   pl: String
   en: String
+  sr: String
 }
 
 type IdeologyIcon {
@@ -206,6 +207,7 @@ enum QuizLicense {
 enum Language {
   POLISH
   ENGLISH
+  SERBIAN
 }
 
 type QuizVerifyRequest {
@@ -386,6 +388,7 @@ input CreateQuizInput {
 input TextTranslationInput {
   pl: String
   en: String
+  sr: String
 }
 
 input UpdateQuizInput {
