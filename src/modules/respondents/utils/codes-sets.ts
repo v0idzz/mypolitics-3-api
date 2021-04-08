@@ -1,5 +1,6 @@
 import CODES_PL from '../../../assets/respondents/pl.json';
 import CODES_EN from '../../../assets/respondents/en.json';
+import CODES_SR from '../../../assets/respondents/sr.json';
 import { Language } from '../../../shared/enums/language.enum';
 
 interface CodesSet {
@@ -12,6 +13,7 @@ interface CodesSet {
 export const codesSets: Record<Language, CodesSet> = {
   pl: CODES_PL,
   en: CODES_EN,
+  sr: CODES_SR
 };
 
 const getRandomInt = (min: number, max: number) => (
