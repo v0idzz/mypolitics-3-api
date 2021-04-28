@@ -310,6 +310,7 @@ type Query {
   respondent(code: [String!]!): Respondent!
   meRespondent: Respondent!
   verifyAdmin: Boolean!
+  avgResults: Boolean!
   survey(id: String!): Survey!
   quiz(slug: String!): Quiz!
   featuredQuizzes: [Quiz!]!

@@ -159,10 +159,12 @@ export default `
                         <span>{{firstName}}</span>
                         <span>{{lastName}}</span>
                     </div>
+                    {{#if partyName}}
                     <div class="person-party" style="">
                         <img src="{{partySrc}}">
                         <span style="">{{partyName}}</span>
                     </div>
+                  {{/if}}
                 </div>
                 {{/each}}
             </div>
