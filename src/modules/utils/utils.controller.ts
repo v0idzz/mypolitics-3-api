@@ -15,7 +15,7 @@ export class UtilsController {
   ) {}
 
   @UseInterceptors(RateLimiterInterceptor)
-  @RateLimit({ keyPrefix: 'images', points: 1, duration: 60, errorMessage: 'Images cannot be generated more than once in per minute' })
+  @RateLimit({ keyPrefix: 'images', points: 1, duration: 15, errorMessage: 'Images cannot be generated more than once in 15 s' })
   @Get('images')
   async getImage(
     @Res() res: Response,
