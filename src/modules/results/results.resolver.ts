@@ -9,6 +9,7 @@ import { QuizzesService } from '../quizzes/quizzes.service';
 import { ResultsClassicService } from '../results-classic/results-classic.service';
 import { CurrentUser } from '../../shared/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
+import { ResultsCompass } from './entities/results-compass.entity';
 
 @Resolver(() => Results)
 export class ResultsResolver {
